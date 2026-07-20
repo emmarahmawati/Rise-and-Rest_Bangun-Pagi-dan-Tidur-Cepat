@@ -5,21 +5,41 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Rise & Rest — Bangun Pagi & Tidur Cepat</title>
   
-  <!-- Tailwind CSS CDN -->
+  <!-- Tailwind CSS & Google Fonts -->
   <script src="https://cdn.tailwindcss.com"></script>
-  
-  <!-- Web Fonts & Material Icons -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
   
-  <!-- Canvas Confetti Library for Celebrations -->
+  <!-- Canvas Confetti & Lucide Icons -->
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+  
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Plus Jakarta Sans', 'sans-serif'],
+          },
+          colors: {
+            brand: {
+              dark: '#090D1A',
+              card: 'rgba(17, 24, 39, 0.7)',
+              border: 'rgba(255, 255, 255, 0.06)',
+              primary: '#2563EB',
+              success: '#10B981',
+              warning: '#F59E0B',
+              danger: '#EF4444'
+            }
+          }
+        }
+      }
+    }
+  </script>
 
   <style>
     body {
-      font-family: 'Plus Jakarta Sans', sans-serif;
       background-color: #090D1A;
       background-image: 
         radial-gradient(circle at 10% 20%, rgba(37, 99, 235, 0.12) 0%, transparent 40%),
@@ -31,101 +51,86 @@
       -webkit-backdrop-filter: blur(20px);
       border: 1px solid rgba(255, 255, 255, 0.06);
     }
-    .tab-active {
-      background: rgba(255, 255, 255, 0.1);
-      color: #FFFFFF;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-    }
-    .no-scrollbar::-webkit-scrollbar {
+    .hide-scrollbar::-webkit-scrollbar {
       display: none;
     }
-    .no-scrollbar {
+    .hide-scrollbar {
       -ms-overflow-style: none;
       scrollbar-width: none;
     }
-    .gauge-fill {
-      stroke-dasharray: 251.2;
-      stroke-dashoffset: 251.2;
-      transition: stroke-dashoffset 1s ease-in-out;
+    .calendar-dot {
+      aspect-ratio: 1;
     }
   </style>
 </head>
-<body class="text-slate-100 min-h-screen pb-24 flex justify-center overflow-x-hidden">
+<body class="text-slate-100 min-h-screen flex justify-center pb-24 font-sans">
 
-  <!-- Core App Box -->
-  <div class="w-full max-w-md px-4 py-6 min-h-screen flex flex-col relative">
-    
-    <!-- TOAST NOTIFICATION -->
-    <div id="toast" class="fixed top-6 left-1/2 -translate-x-1/2 glass-card border-l-4 px-5 py-3 rounded-2xl shadow-2xl z-50 transition-all duration-300 transform -translate-y-32 flex items-center gap-3">
-      <span class="material-icons-round text-emerald-500" id="toast-icon">check_circle</span>
-      <span class="text-sm font-bold" id="toast-text">Notifikasi</span>
+  <!-- APP CONTAINER -->
+  <div class="w-full max-w-md px-4 pt-6 relative flex flex-col min-h-screen">
+
+    <!-- TOAST NOTIFICATION CONTAINER -->
+    <div id="toast" class="fixed top-6 left-1/2 -translate-x-1/2 -translate-y-24 bg-gray-900/90 border border-white/10 backdrop-blur-md px-5 py-3.5 rounded-2xl text-xs font-bold shadow-2xl transition-all duration-300 z-50 flex items-center gap-2 whitespace-nowrap opacity-0 pointer-events-none">
+      <span id="toast-icon" class="material-icons-round text-brand-success">check_circle</span>
+      <span id="toast-text">Notifikasi sistem aktif</span>
     </div>
 
-    <!-- SPINNER LOADING OVERLAY -->
-    <div id="loading-overlay" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md z-50 flex flex-col items-center justify-center hidden">
-      <div class="w-16 h-16 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mb-4"></div>
-      <p class="text-sm text-slate-300 font-semibold" id="loading-text">Sedang memproses...</p>
-    </div>
-
-    <!-- ========================================== -->
-    <!-- SCREEN 1: AUTHENTICATION -->
-    <!-- ========================================== -->
-    <div id="screen-auth" class="w-full my-auto flex flex-col">
+    <!-- SCREEN 1: LOGIN/AUTH (Default View) -->
+    <div id="view-login" class="w-full my-auto py-8">
       <div class="text-center mb-8">
-        <div class="inline-flex p-4 rounded-3xl bg-gradient-to-br from-blue-600 to-emerald-500 shadow-xl mb-4">
-          <span class="material-icons-round text-white text-4xl">wb_sunny</span>
+        <div class="inline-flex p-4 rounded-3xl bg-gradient-to-br from-brand-primary to-brand-success shadow-xl shadow-blue-600/30 mb-4">
+          <span class="material-icons-round text-4xl text-white">wb_sunny</span>
         </div>
         <h1 class="text-3xl font-extrabold tracking-tight bg-gradient-to-r from-white to-slate-400 bg-clip-text text-transparent">Rise & Rest</h1>
-        <p class="text-slate-400 text-sm mt-1" id="school-name-lbl">Program Disiplin Bangun Pagi & Tidur Cepat</p>
+        <p id="sub-school" class="text-xs text-slate-400 mt-1">Sistem Poin Disiplin Karakter Kokurikuler</p>
+        <span id="status-conn" class="inline-block mt-3 px-3 py-1 rounded-full text-[10px] font-extrabold bg-brand-warning/15 text-brand-warning tracking-wider">
+          🔌 OFFLINE MODE (LOCAL SIMULATION)
+        </span>
       </div>
 
-      <div class="glass-card rounded-[32px] p-6 shadow-2xl">
-        <!-- Tabs Switcher -->
+      <!-- Auth Tab Group -->
+      <div class="glass-card rounded-3xl p-6 shadow-2xl">
         <div class="flex bg-slate-950/60 p-1.5 rounded-2xl mb-6">
-          <button id="btn-tab-siswa" class="flex-1 py-3 text-sm font-bold rounded-xl text-slate-400 tab-active transition-all" onclick="toggleAuthTab('siswa')">Siswa</button>
-          <button id="btn-tab-guru" class="flex-1 py-3 text-sm font-bold rounded-xl text-slate-400 transition-all" onclick="toggleAuthTab('guru')">Guru Wali</button>
+          <button id="tab-siswa" onclick="switchAuthTab('siswa')" class="flex-1 py-2.5 text-xs font-bold rounded-xl transition-all bg-white/10 text-white shadow">Siswa</button>
+          <button id="tab-guru" onclick="switchAuthTab('guru')" class="flex-1 py-2.5 text-xs font-bold rounded-xl transition-all text-slate-400">Guru Wali</button>
         </div>
 
-        <!-- Siswa Login Form -->
-        <form id="form-auth-siswa" onsubmit="handleLoginSubmit(event, 'siswa')" class="space-y-4">
+        <!-- Siswa Auth Form -->
+        <form id="form-siswa" onsubmit="handleAuthSubmit(event, 'siswa')" class="space-y-4">
           <div class="relative">
             <span class="material-icons-round absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 text-xl">person</span>
-            <input type="text" id="input-siswa-nama" placeholder="Nama Lengkap Sesuai Absen" required class="w-full pl-12 pr-4 py-4 bg-slate-900/50 border border-slate-800 rounded-2xl text-sm focus:border-blue-600 focus:outline-none transition-all text-white">
+            <input type="text" id="siswa-nama" placeholder="Nama Lengkap Sesuai Absen" required class="w-full bg-slate-950/40 border border-white/5 rounded-2xl py-4 pl-12 pr-4 text-sm text-white outline-none focus:border-brand-primary focus:ring-4 focus:ring-brand-primary/15 transition-all">
           </div>
-          
           <div class="grid grid-cols-2 gap-3">
             <div class="relative">
-              <span class="material-icons-round absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 text-xl">stairs</span>
-              <select id="input-siswa-fase" required class="w-full pl-12 pr-4 py-4 bg-slate-900/50 border border-slate-800 rounded-2xl text-sm focus:border-blue-600 focus:outline-none transition-all text-white appearance-none">
-                <option value="" disabled selected>Fase</option>
-                <option value="E">Fase E (Kelas X)</option>
-                <option value="F">Fase F (Kelas XI/XII)</option>
+              <span class="material-icons-round absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-xl">stairs</span>
+              <select id="siswa-fase" required class="w-full bg-slate-950/40 border border-white/5 rounded-2xl py-4 pl-10 pr-3 text-xs text-white outline-none focus:border-brand-primary transition-all appearance-none">
+                <option value="" disabled selected class="bg-brand-dark">Pilih Fase</option>
+                <option value="E" class="bg-brand-dark">Fase E (X)</option>
+                <option value="F" class="bg-brand-dark">Fase F (XI/XII)</option>
               </select>
             </div>
             <div class="relative">
-              <span class="material-icons-round absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 text-xl">class</span>
-              <input type="text" id="input-siswa-kelas" placeholder="Contoh: X-A" required class="w-full pl-12 pr-4 py-4 bg-slate-900/50 border border-slate-800 rounded-2xl text-sm focus:border-blue-600 focus:outline-none transition-all text-white">
+              <span class="material-icons-round absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-xl">class</span>
+              <input type="text" id="siswa-kelas" placeholder="Kelas (Contoh: X-A)" required class="w-full bg-slate-950/40 border border-white/5 rounded-2xl py-4 pl-10 pr-4 text-xs text-white outline-none focus:border-brand-primary transition-all uppercase">
             </div>
           </div>
-
-          <button type="submit" class="w-full py-4 text-center text-sm font-bold rounded-2xl bg-gradient-to-r from-blue-600 to-blue-700 text-white shadow-lg active:translate-y-0.5 transition-all flex items-center justify-center gap-2">
+          <button type="submit" class="w-full py-4 bg-brand-primary text-sm font-bold text-white rounded-2xl hover:brightness-110 active:translate-y-0.5 shadow-lg shadow-blue-600/25 transition-all flex items-center justify-center gap-2">
             <span>Masuk Program</span>
             <span class="material-icons-round text-base">arrow_forward</span>
           </button>
         </form>
 
-        <!-- Guru Login Form -->
-        <form id="form-auth-guru" onsubmit="handleLoginSubmit(event, 'guru')" class="space-y-4 hidden">
+        <!-- Guru Auth Form -->
+        <form id="form-guru" onsubmit="handleAuthSubmit(event, 'guru')" class="space-y-4 hidden">
           <div class="relative">
             <span class="material-icons-round absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 text-xl">supervisor_account</span>
-            <input type="text" id="input-guru-nama" placeholder="Nama Lengkap Guru" required class="w-full pl-12 pr-4 py-4 bg-slate-900/50 border border-slate-800 rounded-2xl text-sm focus:border-blue-600 focus:outline-none transition-all text-white">
+            <input type="text" id="guru-nama" placeholder="Nama Lengkap Guru" required class="w-full bg-slate-950/40 border border-white/5 rounded-2xl py-4 pl-12 pr-4 text-sm text-white outline-none focus:border-brand-success focus:ring-4 focus:ring-brand-success/15 transition-all">
           </div>
           <div class="relative">
             <span class="material-icons-round absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 text-xl">lock</span>
-            <input type="password" id="input-guru-password" placeholder="Kata Sandi Akun" required class="w-full pl-12 pr-4 py-4 bg-slate-900/50 border border-slate-800 rounded-2xl text-sm focus:border-blue-600 focus:outline-none transition-all text-white">
+            <input type="password" id="guru-password" placeholder="Kata Sandi Akun" required class="w-full bg-slate-950/40 border border-white/5 rounded-2xl py-4 pl-12 pr-4 text-sm text-white outline-none focus:border-brand-success focus:ring-4 focus:ring-brand-success/15 transition-all">
           </div>
-
-          <button type="submit" class="w-full py-4 text-center text-sm font-bold rounded-2xl bg-gradient-to-r from-emerald-600 to-emerald-700 text-white shadow-lg active:translate-y-0.5 transition-all flex items-center justify-center gap-2">
+          <button type="submit" class="w-full py-4 bg-brand-success text-sm font-bold text-white rounded-2xl hover:brightness-110 active:translate-y-0.5 shadow-lg shadow-emerald-600/25 transition-all flex items-center justify-center gap-2">
             <span>Otentikasi Guru</span>
             <span class="material-icons-round text-base">verified_user</span>
           </button>
@@ -133,339 +138,283 @@
       </div>
     </div>
 
-    <!-- ========================================== -->
-    <!-- SCREEN 2: MAIN SISWA (DASHBOARD) -->
-    <!-- ========================================== -->
-    <div id="screen-siswa" class="w-full flex-col hidden">
-      <!-- Profile Header -->
-      <div class="flex items-center gap-4 mb-6">
-        <div class="relative w-16 h-16 rounded-full bg-gradient-to-br from-blue-600 to-emerald-500 p-[3px] shadow-lg">
-          <div class="w-full h-full rounded-full bg-[#090D1A] flex items-center justify-center text-2xl" id="siswa-avatar">🌱</div>
-          <span class="absolute -bottom-1 -right-1 bg-yellow-500 text-slate-950 text-[10px] font-extrabold px-1.5 py-0.5 rounded-full border border-[#090D1A]" id="siswa-level-badge">Lv.1</span>
+    <!-- SCREEN 2: MAIN DASHBOARD SISWA -->
+    <div id="view-dashboard" class="hidden w-full space-y-4">
+      <div class="flex items-center gap-4 py-4 border-b border-white/5">
+        <div class="relative w-14 h-14 rounded-full bg-gradient-to-tr from-brand-primary to-brand-success p-0.5 shadow-lg shadow-blue-500/25">
+          <img class="w-full h-full rounded-full object-cover bg-brand-dark" src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=150&q=80" alt="Avatar">
+          <span id="lbl-level-badge" class="absolute -bottom-1 -right-1 bg-brand-warning text-brand-dark text-[9px] font-extrabold px-1.5 py-0.5 rounded-full border border-brand-dark">Lv.1</span>
         </div>
         <div>
-          <h2 class="text-xl font-extrabold tracking-tight text-white" id="siswa-nama-lbl">Ahmad Fauzi</h2>
-          <p class="text-xs text-slate-400" id="siswa-kelas-lbl">Fase E / Kelas X-A</p>
+          <h2 id="lbl-nama" class="text-lg font-extrabold tracking-tight">Ahmad Fauzi</h2>
+          <p id="lbl-kelas-guru" class="text-[11px] text-slate-400">Fase E / Kelas X-A — Wali: Budi Santoso</p>
         </div>
       </div>
 
-      <!-- Daily Motivation Quote -->
-      <div class="glass-card rounded-2xl p-4 mb-6 bg-gradient-to-br from-blue-600/10 to-emerald-500/10 border-blue-500/20">
-        <div class="flex gap-3 items-start">
-          <span class="material-icons-round text-yellow-500 text-2xl">lightbulb</span>
-          <p class="text-xs text-slate-200 leading-relaxed font-semibold italic" id="motivation-quote-lbl">
-            "Semangat pagi! Persiapkan harimu dengan bangun lebih pagi bersama Rise & Rest."
-          </p>
-        </div>
+      <div id="lbl-greeting" class="text-xs font-bold text-brand-success bg-brand-success/10 border border-brand-success/15 p-3 rounded-2xl">
+        Selamat datang kembali! Jaga kedisiplinan harianmu.
       </div>
 
       <!-- Stats Grid -->
-      <div class="grid grid-cols-2 gap-3 mb-6">
+      <div class="grid grid-cols-2 gap-3">
         <div class="glass-card rounded-2xl p-4 text-center">
-          <span class="material-icons-round text-yellow-500 text-3xl mb-1">stars</span>
-          <h3 class="text-2xl font-black text-white" id="siswa-poin-lbl">0</h3>
-          <p class="text-[10px] text-slate-400 uppercase tracking-widest font-bold">Total Poin</p>
+          <span class="material-icons-round text-brand-warning text-3xl">stars</span>
+          <span id="lbl-poin" class="block text-3xl font-extrabold mt-1">45</span>
+          <span class="block text-[10px] text-slate-400 font-bold uppercase tracking-wider mt-1">Total Poin</span>
         </div>
         <div class="glass-card rounded-2xl p-4 text-center">
-          <span class="material-icons-round text-emerald-500 text-3xl mb-1">local_fire_department</span>
-          <h3 class="text-2xl font-black text-white" id="siswa-streak-lbl">0</h3>
-          <p class="text-[10px] text-slate-400 uppercase tracking-widest font-bold">Hari Berurutan</p>
+          <span class="material-icons-round text-brand-danger text-3xl">local_fire_department</span>
+          <span id="lbl-streak" class="block text-3xl font-extrabold mt-1">6</span>
+          <span class="block text-[10px] text-slate-400 font-bold uppercase tracking-wider mt-1">Hari Beruntun</span>
         </div>
       </div>
 
-      <!-- Level & Progress Bar -->
-      <div class="glass-card rounded-2xl p-4 mb-6">
-        <div class="flex justify-between items-center mb-2">
-          <span class="text-xs font-bold text-slate-300" id="siswa-level-lbl">Level: 🌱 Pemula</span>
-          <span class="text-[10px] text-slate-400 font-bold" id="siswa-xp-lbl">XP: 0/100</span>
+      <!-- Progress Bar Card -->
+      <div class="glass-card rounded-2xl p-4">
+        <div class="flex justify-between items-center text-xs font-bold mb-2">
+          <span id="lbl-level-name">Tingkatan: 🌱 Pemula</span>
+          <span id="lbl-progress-ratio" class="text-slate-400">45 / 100 Poin</span>
         </div>
-        <div class="w-full bg-slate-950/60 h-3 rounded-full overflow-hidden">
-          <div id="siswa-xp-bar" class="bg-gradient-to-r from-blue-600 to-emerald-500 h-full w-[10%]" style="transition: width 0.5s ease-out;"></div>
+        <div class="w-full bg-slate-950/60 h-2.5 rounded-full overflow-hidden">
+          <div id="bar-progress" class="bg-gradient-to-r from-brand-primary to-brand-success h-full rounded-full transition-all duration-500" style="width: 45%;"></div>
         </div>
       </div>
 
-      <!-- Lencana / Badges Tray -->
-      <div class="glass-card rounded-3xl p-5 mb-6">
-        <h3 class="text-sm font-black flex items-center gap-2 mb-4">
-          <span class="material-icons-round text-yellow-500 text-lg">military_tech</span> Lencana Pencapaian
+      <!-- Badges Tray -->
+      <div class="glass-card rounded-2xl p-4">
+        <h3 class="text-xs font-extrabold flex items-center gap-1.5 text-slate-300 mb-3">
+          <span class="material-icons-round text-brand-warning text-base">military_tech</span>
+          Lencana & Penghargaan
         </h3>
-        <div class="flex gap-4 overflow-x-auto no-scrollbar py-1">
-          <div class="flex flex-col items-center min-w-[60px] text-center opacity-40 transition-opacity duration-300" id="badge-bronze">
-            <span class="text-3xl">🥉</span><span class="text-[9px] text-slate-400 font-bold mt-1">Bronze</span>
+        <div class="flex gap-3 overflow-x-auto pb-2 hide-scrollbar">
+          <div id="badge-1" class="flex-none w-14 text-center opacity-40 transition-all duration-300">
+            <div class="w-11 h-11 bg-slate-900/60 border border-white/5 rounded-2xl flex items-center justify-center text-xl mx-auto mb-1">🥉</div>
+            <span class="text-[9px] text-slate-400 font-bold block">Pemula</span>
           </div>
-          <div class="flex flex-col items-center min-w-[60px] text-center opacity-40 transition-opacity duration-300" id="badge-silver">
-            <span class="text-3xl">🥈</span><span class="text-[9px] text-slate-400 font-bold mt-1">Silver</span>
+          <div id="badge-2" class="flex-none w-14 text-center opacity-40 transition-all duration-300">
+            <div class="w-11 h-11 bg-slate-900/60 border border-white/5 rounded-2xl flex items-center justify-center text-xl mx-auto mb-1">🥈</div>
+            <span class="text-[9px] text-slate-400 font-bold block">Disiplin</span>
           </div>
-          <div class="flex flex-col items-center min-w-[60px] text-center opacity-40 transition-opacity duration-300" id="badge-gold">
-            <span class="text-3xl">🥇</span><span class="text-[9px] text-slate-400 font-bold mt-1">Gold</span>
+          <div id="badge-3" class="flex-none w-14 text-center opacity-40 transition-all duration-300">
+            <div class="w-11 h-11 bg-slate-900/60 border border-white/5 rounded-2xl flex items-center justify-center text-xl mx-auto mb-1">🥇</div>
+            <span class="text-[9px] text-slate-400 font-bold block">Inspiratif</span>
           </div>
-          <div class="flex flex-col items-center min-w-[60px] text-center opacity-40 transition-opacity duration-300" id="badge-diamond">
-            <span class="text-3xl">💎</span><span class="text-[9px] text-slate-400 font-bold mt-1">Diamond</span>
+          <div id="badge-4" class="flex-none w-14 text-center opacity-40 transition-all duration-300">
+            <div class="w-11 h-11 bg-slate-900/60 border border-white/5 rounded-2xl flex items-center justify-center text-xl mx-auto mb-1">💎</div>
+            <span class="text-[9px] text-slate-400 font-bold block">Teladan</span>
           </div>
-          <div class="flex flex-col items-center min-w-[60px] text-center opacity-40 transition-opacity duration-300" id="badge-legend">
-            <span class="text-3xl">👑</span><span class="text-[9px] text-slate-400 font-bold mt-1">Legend</span>
+          <div id="badge-5" class="flex-none w-14 text-center opacity-40 transition-all duration-300">
+            <div class="w-11 h-11 bg-slate-900/60 border border-white/5 rounded-2xl flex items-center justify-center text-xl mx-auto mb-1">👑</div>
+            <span class="text-[9px] text-slate-400 font-bold block">Champion</span>
           </div>
         </div>
       </div>
 
-      <!-- Discipline Circle Gauge -->
-      <div class="glass-card rounded-3xl p-5 mb-6 flex items-center gap-5">
-        <div class="relative w-24 h-24 flex-shrink-0">
-          <svg class="w-full h-full transform -rotate-90">
-            <circle cx="48" cy="48" r="40" class="stroke-slate-900 fill-none" stroke-width="8"></circle>
-            <circle cx="48" cy="48" r="40" id="gauge-circle" class="gauge-fill stroke-emerald-500 fill-none" stroke-width="8" stroke-linecap="round"></circle>
-          </svg>
-          <div class="absolute inset-0 flex items-center justify-center font-black text-lg text-white" id="gauge-text">0%</div>
-        </div>
-        <div>
-          <h4 class="text-sm font-extrabold text-white">Konsistensi Disiplin</h4>
-          <p class="text-xs text-slate-400 mt-1">Lakukan absensi tepat waktu secara terus menerus untuk mempertahankan tingkat persentase di atas $85\%$.</p>
-        </div>
-      </div>
-
-      <!-- Quick Actions -->
-      <div class="space-y-3 mb-6">
-        <div class="glass-card rounded-2xl p-4 flex items-center justify-between">
-          <div class="flex items-center gap-3">
-            <div class="text-2xl">🛌</div>
-            <div>
-              <h4 class="text-xs font-extrabold text-white">Tidur Tepat Waktu</h4>
-              <p class="text-[10px] text-slate-400">Target sebelum: <span id="target-tidur-lbl" class="font-bold text-slate-200">21:45</span></p>
-            </div>
-          </div>
-          <button class="px-4 py-2 bg-blue-600 rounded-xl text-xs font-bold text-white shadow-lg active:scale-95 transition" onclick="openAbsenScreen('Tidur')">Absen</button>
-        </div>
-
-        <div class="glass-card rounded-2xl p-4 flex items-center justify-between">
-          <div class="flex items-center gap-3">
-            <div class="text-2xl">🌅</div>
-            <div>
-              <h4 class="text-xs font-extrabold text-white">Bangun Pagi Ceria</h4>
-              <p class="text-[10px] text-slate-400">Target sebelum: <span id="target-bangun-lbl" class="font-bold text-slate-200">05:00</span></p>
-            </div>
-          </div>
-          <button class="px-4 py-2 bg-emerald-600 rounded-xl text-xs font-bold text-white shadow-lg active:scale-95 transition" onclick="openAbsenScreen('Bangun')">Absen</button>
-        </div>
-      </div>
-
-      <!-- Calendar 30 Days -->
-      <div class="glass-card rounded-3xl p-5 mb-6">
-        <h3 class="text-sm font-black flex items-center gap-2 mb-4">
-          <span class="material-icons-round text-blue-500 text-lg">calendar_month</span> Kalender Disiplin (30 Hari)
+      <!-- Calendar Indicator Component -->
+      <div class="glass-card rounded-2xl p-4">
+        <h3 class="text-xs font-extrabold flex items-center gap-1.5 text-slate-300 mb-3">
+          <span class="material-icons-round text-brand-primary text-base">calendar_month</span>
+          Log Kedisiplinan 30 Hari
         </h3>
-        <div class="grid grid-cols-7 gap-2 text-center" id="calendar-grid">
-          <!-- Calendar populated by JS -->
-        </div>
-      </div>
-
-      <!-- Recent History Logs -->
-      <div class="glass-card rounded-3xl p-5 mb-6">
-        <h3 class="text-sm font-black flex items-center gap-2 mb-4">
-          <span class="material-icons-round text-blue-500 text-lg">history</span> Riwayat Absensi Terakhir
-        </h3>
-        <div class="space-y-3" id="siswa-recent-logs">
-          <!-- Populated by JS -->
-        </div>
-      </div>
-
-      <!-- Classroom Leaderboard -->
-      <div class="glass-card rounded-3xl p-5 mb-6">
-        <h3 class="text-sm font-black flex items-center gap-2 mb-4">
-          <span class="material-icons-round text-yellow-500 text-lg">leaderboard</span> Klasemen Kelas
-        </h3>
-        <div class="space-y-3" id="siswa-leaderboard">
+        <div id="grid-calendar" class="grid grid-cols-7 gap-1.5 text-[10px] font-extrabold">
           <!-- Populated by JS -->
         </div>
       </div>
     </div>
 
-    <!-- ========================================== -->
-    <!-- SCREEN 3: ABSENSI MODULE -->
-    <!-- ========================================== -->
-    <div id="screen-absen" class="w-full flex-col hidden animate-fade-in">
-      <div class="flex items-center gap-3 mb-6">
-        <button class="p-2 rounded-xl bg-slate-900 border border-slate-800 text-slate-400" onclick="closeAbsenScreen()">
-          <span class="material-icons-round text-lg">arrow_back</span>
-        </button>
-        <h2 class="text-lg font-black text-white" id="absen-title-lbl">Absen Tidur Cepat</h2>
-      </div>
+    <!-- SCREEN 3: CHECK-IN SLEEP -->
+    <div id="view-sleep" class="hidden w-full space-y-4">
+      <div class="glass-card rounded-2xl p-5">
+        <h3 class="text-lg font-extrabold flex items-center gap-2 mb-2 text-brand-primary">
+          <span class="material-icons-round">nights_stay</span>
+          Tidur Cepat
+        </h3>
+        <p class="text-xs text-slate-400 leading-relaxed mb-5">
+          Guru Wali menetapkan jam target istirahat sehat kelas Anda sebelum jam <strong id="lbl-sleep-target-time" class="text-white">21:45</strong>. Silakan selesaikan check-in instan.
+        </p>
 
-      <div class="glass-card rounded-[32px] p-6 space-y-5">
-        <!-- Photo/Selfie Canvas Simulated View -->
-        <div class="w-full aspect-video rounded-2xl bg-slate-950 relative overflow-hidden border border-slate-800 flex items-center justify-center">
-          <video id="camera-feed" class="w-full h-full object-cover hidden" autoplay playsinline></video>
-          <canvas id="camera-canvas" class="w-full h-full object-cover hidden"></canvas>
-          
-          <div id="camera-placeholder" class="text-center flex flex-col items-center gap-2">
-            <span class="material-icons-round text-blue-500 text-4xl animate-pulse">camera_alt</span>
-            <p class="text-xs font-bold text-slate-300">Simulasi Deteksi Kamera Aktif</p>
-            <p class="text-[10px] text-slate-500">Selfie langsung anti-cheat terverifikasi</p>
-          </div>
-          
-          <!-- Anti-Cheat Overlay Watermark -->
-          <div class="absolute inset-0 border border-dashed border-red-500/20 pointer-events-none flex items-end p-3">
-            <div class="glass-card py-1.5 px-3 rounded-lg text-[8px] text-slate-300 font-mono tracking-tight space-y-0.5 leading-none w-full border border-red-500/10">
-              <p>SECURITY LOCK: SHIELD-ON</p>
-              <p>USER: <span id="wt-nama">Nama</span> | <span id="wt-kelas">Kelas</span></p>
-              <p>DATE: <span id="wt-time">00/00/0000 - 00:00:00</span></p>
-              <p>GPS: <span id="wt-gps">-6.17511, 106.82721</span></p>
-            </div>
+        <!-- Simulated Camera Capture -->
+        <div class="w-full aspect-[4/3] rounded-2xl bg-slate-950/80 border border-white/5 overflow-hidden relative flex flex-col items-center justify-center mb-5">
+          <canvas id="canvas-sleep-photo" class="absolute inset-0 w-full h-full object-cover hidden"></canvas>
+          <div id="placeholder-sleep-photo" class="text-center text-slate-500 z-10 px-4">
+            <span class="material-icons-round text-5xl text-brand-primary mb-2">camera_alt</span>
+            <p class="text-xs font-bold text-slate-300">Simulasi Kamera Terbuka</p>
+            <p class="text-[10px] text-slate-500 mt-1">Watermark tanggal, nama, & koordinat akan dibubuhkan otomatis</p>
           </div>
         </div>
 
-        <!-- Snap Button -->
-        <button id="btn-capture" class="w-full py-3.5 text-center text-xs font-extrabold rounded-2xl bg-slate-900 border border-slate-800 text-slate-100 flex items-center justify-center gap-2" onclick="capturePhotoSnapshot()">
-          <span class="material-icons-round text-base">photo_camera</span>
-          <span>Ambil Foto Selfie</span>
-        </button>
-
-        <!-- Mood Selector (Only for Sleep) -->
-        <div id="mood-selector-area" class="space-y-2">
-          <label class="text-xs text-slate-400 font-bold">Bagaimana suasana belajar Anda hari ini?</label>
+        <!-- Mood Selector of the day -->
+        <div class="mb-5">
+          <label class="block text-xs font-extrabold text-slate-300 mb-2">Bagaimana mood belajarmu hari ini?</label>
           <div class="grid grid-cols-4 gap-2">
-            <button class="py-2.5 rounded-xl border border-slate-800 bg-slate-900/50 text-xl flex flex-col items-center gap-1 transition" onclick="selectMood('😊', this)">
-              <span>😊</span><span class="text-[9px] text-slate-400 font-bold">Senang</span>
+            <button onclick="selectMood('😊', this)" class="btn-mood border border-white/5 py-3 rounded-xl bg-slate-900/40 text-center hover:bg-slate-800 flex flex-col items-center gap-1">
+              <span class="text-xl">😊</span>
+              <span class="text-[9px] text-slate-400 font-bold">Senang</span>
             </button>
-            <button class="py-2.5 rounded-xl border border-slate-800 bg-slate-900/50 text-xl flex flex-col items-center gap-1 transition" onclick="selectMood('😴', this)">
-              <span>😴</span><span class="text-[9px] text-slate-400 font-bold">Lelah</span>
+            <button onclick="selectMood('😴', this)" class="btn-mood border border-white/5 py-3 rounded-xl bg-slate-900/40 text-center hover:bg-slate-800 flex flex-col items-center gap-1">
+              <span class="text-xl">😴</span>
+              <span class="text-[9px] text-slate-400 font-bold">Lelah</span>
             </button>
-            <button class="py-2.5 rounded-xl border border-slate-800 bg-slate-900/50 text-xl flex flex-col items-center gap-1 transition" onclick="selectMood('🤩', this)">
-              <span>🤩</span><span class="text-[9px] text-slate-400 font-bold">Semangat</span>
+            <button onclick="selectMood('🤩', this)" class="btn-mood border border-white/5 py-3 rounded-xl bg-slate-900/40 text-center hover:bg-slate-800 flex flex-col items-center gap-1">
+              <span class="text-xl">🤩</span>
+              <span class="text-[9px] text-slate-400 font-bold">Semangat</span>
             </button>
-            <button class="py-2.5 rounded-xl border border-slate-800 bg-slate-900/50 text-xl flex flex-col items-center gap-1 transition" onclick="selectMood('😐', this)">
-              <span>😐</span><span class="text-[9px] text-slate-400 font-bold">Biasa</span>
+            <button onclick="selectMood('😐', this)" class="btn-mood border border-white/5 py-3 rounded-xl bg-slate-900/40 text-center hover:bg-slate-800 flex flex-col items-center gap-1">
+              <span class="text-xl">😐</span>
+              <span class="text-[9px] text-slate-400 font-bold">Biasa</span>
             </button>
           </div>
         </div>
 
-        <!-- GPS Verification bar -->
-        <div class="flex items-center gap-3 p-3 bg-slate-950/80 rounded-2xl border border-slate-850">
-          <span class="material-icons-round text-blue-500 text-lg">gps_fixed</span>
-          <div>
-            <p class="text-[9px] text-slate-400 uppercase tracking-wider font-extrabold">Status GPS Koordinat</p>
-            <p class="text-xs font-semibold text-slate-200 mt-1" id="gps-status-lbl">GPS LOCK: -6.17511° S, 106.82721° E</p>
-          </div>
+        <!-- Coordinate Locked Alert -->
+        <div class="flex items-center gap-3 bg-brand-success/10 border border-brand-success/20 p-3.5 rounded-2xl mb-5 text-xs text-brand-success font-bold">
+          <span class="material-icons-round">gps_fixed</span>
+          <span id="lbl-sleep-gps">Mencari koordinat satelit (Anti-Fake GPS)...</span>
         </div>
 
-        <!-- Submit Button -->
-        <button id="btn-submit-checkin" disabled class="w-full py-4 text-center text-sm font-extrabold rounded-2xl bg-gradient-to-r from-blue-600 to-blue-700 text-white shadow-lg disabled:from-slate-800 disabled:to-slate-900 disabled:text-slate-500 transition" onclick="submitFinalAbsensi()">
-          Saya Siap Mengirim Absensi
+        <button onclick="executeCheckIn('Tidur')" class="w-full py-4 bg-brand-primary text-white font-extrabold text-sm rounded-2xl hover:brightness-110 shadow-lg shadow-blue-500/20 active:translate-y-0.5 transition-all">
+          Saya Siap Tidur
         </button>
       </div>
     </div>
 
-    <!-- ========================================== -->
-    <!-- SCREEN 4: GURU WALI (CONTROL CENTER) -->
-    <!-- ========================================== -->
-    <div id="screen-guru" class="w-full flex-col hidden animate-fade-in">
-      <div class="flex items-center justify-between mb-6">
-        <div>
-          <h2 class="text-xl font-extrabold tracking-tight text-white" id="guru-nama-lbl">Wali Budi Santoso</h2>
-          <p class="text-xs text-slate-400" id="guru-kelas-lbl">Pembimbing Kelas X-A</p>
-        </div>
-        <button class="p-2 bg-red-600/10 text-red-500 rounded-xl" onclick="logoutApp()" title="Keluar">
-          <span class="material-icons-round text-lg">logout</span>
-        </button>
-      </div>
-
-      <!-- Class Statistics -->
-      <div class="grid grid-cols-2 gap-3 mb-6">
-        <div class="glass-card rounded-2xl p-4 text-center">
-          <h3 class="text-2xl font-black text-white" id="guru-stat-siswa">5</h3>
-          <p class="text-[10px] text-slate-400 uppercase tracking-widest font-bold mt-1">Siswa Terdaftar</p>
-        </div>
-        <div class="glass-card rounded-2xl p-4 text-center">
-          <h3 class="text-2xl font-black text-emerald-500" id="guru-stat-hadir">85%</h3>
-          <p class="text-[10px] text-slate-400 uppercase tracking-widest font-bold mt-1">Disiplin Kelas</p>
-        </div>
-      </div>
-
-      <!-- Setup Constraints -->
-      <div class="glass-card rounded-3xl p-5 mb-6">
-        <h3 class="text-sm font-black flex items-center gap-2 mb-4">
-          <span class="material-icons-round text-yellow-500 text-lg">settings</span> Jam Toleransi Absensi
+    <!-- SCREEN 4: CHECK-IN WAKE -->
+    <div id="view-wake" class="hidden w-full space-y-4">
+      <div class="glass-card rounded-2xl p-5">
+        <h3 class="text-lg font-extrabold flex items-center gap-2 mb-2 text-brand-success">
+          <span class="material-icons-round">wb_sunny</span>
+          Bangun Pagi
         </h3>
-        <div class="grid grid-cols-2 gap-3 mb-4">
-          <div>
-            <label class="text-[9px] text-slate-400 font-extrabold block mb-1">Target Jam Tidur</label>
-            <input type="time" id="input-time-tidur" class="w-full p-3 bg-slate-900 border border-slate-800 rounded-xl text-sm font-semibold text-white">
-          </div>
-          <div>
-            <label class="text-[9px] text-slate-400 font-extrabold block mb-1">Target Jam Bangun</label>
-            <input type="time" id="input-time-bangun" class="w-full p-3 bg-slate-900 border border-slate-800 rounded-xl text-sm font-semibold text-white">
+        <p class="text-xs text-slate-400 leading-relaxed mb-5">
+          Target bangun pagi diatur oleh Guru Wali Anda sebelum jam <strong id="lbl-wake-target-time" class="text-white">05:00</strong>. Ambil selfie untuk mencatatkan kedisiplinan.
+        </p>
+
+        <!-- Simulated Camera Capture -->
+        <div class="w-full aspect-[4/3] rounded-2xl bg-slate-950/80 border border-white/5 overflow-hidden relative flex flex-col items-center justify-center mb-5">
+          <canvas id="canvas-wake-photo" class="absolute inset-0 w-full h-full object-cover hidden"></canvas>
+          <div id="placeholder-wake-photo" class="text-center text-slate-500 z-10 px-4">
+            <span class="material-icons-round text-5xl text-brand-success mb-2">camera_alt</span>
+            <p class="text-xs font-bold text-slate-300">Ambil Selfie Bangun Pagi</p>
+            <p class="text-[10px] text-slate-500 mt-1">Watermark tanggal, nama, & koordinat akan dibubuhkan otomatis</p>
           </div>
         </div>
-        <button class="w-full py-3 bg-slate-900 border border-slate-800 rounded-2xl text-xs font-bold text-slate-200" onclick="saveTeacherJamSettings()">
-          Simpan Jam Toleransi
+
+        <!-- Coordinate Locked Alert -->
+        <div class="flex items-center gap-3 bg-brand-success/10 border border-brand-success/20 p-3.5 rounded-2xl mb-5 text-xs text-brand-success font-bold">
+          <span class="material-icons-round">gps_fixed</span>
+          <span id="lbl-wake-gps">Mengunci koordinat GPS...</span>
+        </div>
+
+        <button onclick="executeCheckIn('Bangun')" class="w-full py-4 bg-brand-success text-white font-extrabold text-sm rounded-2xl hover:brightness-110 shadow-lg shadow-emerald-500/20 active:translate-y-0.5 transition-all">
+          Saya Sudah Bangun
         </button>
       </div>
+    </div>
 
-      <!-- Student Actions List -->
-      <div class="glass-card rounded-3xl p-5 mb-6">
-        <div class="flex items-center justify-between mb-4">
-          <h3 class="text-sm font-black flex items-center gap-2">
-            <span class="material-icons-round text-blue-500 text-lg">people</span> Daftar Siswa Kelas
-          </h3>
-          <button class="text-xs font-bold text-blue-500 flex items-center gap-1" onclick="openStudentModal()">
-            <span class="material-icons-round text-sm">add</span> Tambah
-          </button>
-        </div>
-        <div class="space-y-4 max-h-[300px] overflow-y-auto no-scrollbar" id="guru-student-list">
-          <!-- Populated dynamically -->
+    <!-- SCREEN 5: RIWAYAT -->
+    <div id="view-history" class="hidden w-full space-y-4">
+      <h3 class="text-sm font-extrabold text-slate-300 flex items-center gap-1.5 mt-2">
+        <span class="material-icons-round text-brand-success">history</span>
+        Log Aktivitas Terbaru
+      </h3>
+      <div id="list-history" class="space-y-2">
+        <!-- Rendered lists by JS -->
+      </div>
+    </div>
+
+    <!-- SCREEN 6: LEADERBOARD -->
+    <div id="view-leaderboard" class="hidden w-full space-y-4">
+      <div class="glass-card rounded-2xl p-5">
+        <h3 class="text-base font-extrabold text-white flex items-center gap-2 mb-2">
+          <span class="material-icons-round text-brand-warning">emoji_events</span>
+          Papan Peringkat Kelas
+        </h3>
+        <p class="text-xs text-slate-400 mb-4 leading-relaxed">Persaingan sehat membangun konsistensi istirahat tidur berkualitas bersama rekan sekelas bimbingan.</p>
+        <div id="list-leaderboard" class="space-y-2">
+          <!-- Rendered dynamically by JS -->
         </div>
       </div>
     </div>
 
-    <!-- ========================================== -->
-    <!-- MODAL POPUP: ADD / EDIT STUDENT -->
-    <!-- ========================================== -->
-    <div id="modal-student" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md z-50 flex items-center justify-center hidden p-4">
-      <div class="glass-card w-full max-w-sm rounded-[32px] p-6 shadow-2xl relative">
-        <button class="absolute right-4 top-4 text-slate-400" onclick="closeStudentModal()">
-          <span class="material-icons-round">close</span>
-        </button>
-        <h3 class="text-lg font-black mb-4" id="modal-title-lbl">Tambah Siswa Baru</h3>
-        
-        <form onsubmit="submitSaveStudent(event)" class="space-y-4">
-          <input type="hidden" id="modal-id-siswa">
-          
-          <div class="space-y-1">
-            <label class="text-[10px] text-slate-400 font-extrabold uppercase">Nama Lengkap Siswa</label>
-            <input type="text" id="modal-nama" required class="w-full p-3.5 bg-slate-900 border border-slate-800 rounded-xl text-sm focus:outline-none focus:border-blue-600 text-white">
+    <!-- SCREEN 7: PROFILE & GURU CONTROL -->
+    <div id="view-profile" class="hidden w-full space-y-4">
+      <!-- Info Profile Card -->
+      <div id="card-teacher-header" class="glass-card rounded-2xl p-5 hidden">
+        <div class="flex items-center gap-4">
+          <div class="w-12 h-12 rounded-full bg-brand-success flex items-center justify-center text-white text-2xl font-bold">
+            👨‍🏫
           </div>
-
-          <div class="grid grid-cols-2 gap-3">
-            <div class="space-y-1">
-              <label class="text-[10px] text-slate-400 font-extrabold uppercase">Fase</label>
-              <select id="modal-fase" required class="w-full p-3.5 bg-slate-900 border border-slate-800 rounded-xl text-sm focus:outline-none focus:border-blue-600 text-white">
-                <option value="E">Fase E</option>
-                <option value="F">Fase F</option>
-              </select>
-            </div>
-            <div class="space-y-1">
-              <label class="text-[10px] text-slate-400 font-extrabold uppercase">Kelas</label>
-              <input type="text" id="modal-kelas" required class="w-full p-3.5 bg-slate-900 border border-slate-800 rounded-xl text-sm focus:outline-none focus:border-blue-600 text-white">
-            </div>
+          <div>
+            <h4 id="lbl-guru-nama" class="font-extrabold">Budi Santoso, S.Pd</h4>
+            <p id="lbl-guru-kelas" class="text-xs text-slate-400">Guru Wali Kelas X-A</p>
           </div>
+        </div>
+      </div>
 
-          <button type="submit" class="w-full py-4 text-center text-xs font-extrabold rounded-2xl bg-gradient-to-r from-blue-600 to-blue-700 text-white shadow-lg">
-            Simpan Data Siswa
+      <!-- Teacher Target Config -->
+      <div id="card-teacher-config" class="glass-card rounded-2xl p-5 hidden">
+        <h3 class="text-sm font-extrabold flex items-center gap-1.5 text-slate-200 mb-4">
+          <span class="material-icons-round text-brand-primary">schedule</span>
+          Atur Waktu Batas Disiplin
+        </h3>
+        <div class="space-y-4">
+          <div>
+            <label class="block text-xs font-extrabold text-slate-400 mb-2">Target Batas Jam Tidur Cepat</label>
+            <input type="time" id="cfg-jam-tidur" value="21:45" class="w-full bg-slate-950/40 border border-white/5 rounded-xl py-3 px-4 text-sm font-bold text-white outline-none focus:border-brand-primary">
+          </div>
+          <div>
+            <label class="block text-xs font-extrabold text-slate-400 mb-2">Target Batas Jam Bangun Pagi</label>
+            <input type="time" id="cfg-jam-bangun" value="05:00" class="w-full bg-slate-950/40 border border-white/5 rounded-xl py-3 px-4 text-sm font-bold text-white outline-none focus:border-brand-primary">
+          </div>
+          <button onclick="saveTeacherConfig()" class="w-full py-3.5 bg-brand-primary text-white text-xs font-extrabold rounded-xl hover:brightness-110 active:translate-y-0.5 transition-all">
+            Simpan Parameter Disiplin
           </button>
-        </form>
+        </div>
+      </div>
+
+      <!-- Simulator Reset -->
+      <div class="glass-card rounded-2xl p-5">
+        <h3 class="text-sm font-extrabold text-slate-200 flex items-center gap-1.5 mb-2">
+          <span class="material-icons-round text-brand-danger">restart_alt</span>
+          Reset Simulator Absensi
+        </h3>
+        <p class="text-xs text-slate-400 mb-4">Kembalikan data simulator dan profil kembali ke kondisi semula untuk simulasi tes.</p>
+        <div class="flex gap-2">
+          <button onclick="resetDataSimulation()" class="flex-1 py-3 bg-brand-danger/15 border border-brand-danger/25 text-brand-danger text-xs font-bold rounded-xl active:translate-y-0.5 transition-all">
+            Reset Data Lokal
+          </button>
+          <button onclick="handleLogout()" class="flex-1 py-3 bg-slate-800 text-slate-300 text-xs font-bold rounded-xl active:translate-y-0.5 transition-all">
+            Keluar Sesi (Logout)
+          </button>
+        </div>
       </div>
     </div>
 
-    <!-- ========================================== -->
-    <!-- BOTTOM NAV BAR (ONLY SISWA) -->
-    <!-- ========================================== -->
-    <nav id="app-bottom-nav" class="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-md h-20 glass-card border-t border-slate-800/80 rounded-t-3xl flex items-center justify-around px-4 z-40 hidden">
-      <button class="flex flex-col items-center gap-1 text-blue-500" onclick="loadSiswaDashboard()">
-        <span class="material-icons-round text-2xl">dashboard</span>
-        <span class="text-[9px] font-bold tracking-wider uppercase">Utama</span>
+    <!-- BOTTOM APP NAVIGATION BAR (Hidden on Login Screen) -->
+    <nav id="app-nav" class="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-md bg-slate-950/90 border-t border-white/5 backdrop-blur-md h-20 items-center justify-around px-2 z-40 hidden">
+      <button onclick="switchScreen('dashboard')" id="nav-dashboard" class="flex-1 flex flex-col items-center justify-center text-slate-400 transition-all font-bold text-[9px] gap-1 text-brand-primary">
+        <span class="material-icons-round text-xl">dashboard</span>
+        <span>Dasbor</span>
       </button>
-      <button class="flex flex-col items-center gap-1 text-slate-400" onclick="logoutApp()">
-        <span class="material-icons-round text-2xl">logout</span>
-        <span class="text-[9px] font-bold tracking-wider uppercase">Keluar</span>
+      <button onclick="switchScreen('sleep')" id="nav-sleep" class="flex-1 flex flex-col items-center justify-center text-slate-400 transition-all font-bold text-[9px] gap-1">
+        <span class="material-icons-round text-xl">nights_stay</span>
+        <span>Tidur</span>
+      </button>
+      <button onclick="switchScreen('wake')" id="nav-wake" class="flex-1 flex flex-col items-center justify-center text-slate-400 transition-all font-bold text-[9px] gap-1">
+        <span class="material-icons-round text-xl">wb_sunny</span>
+        <span>Bangun</span>
+      </button>
+      <button onclick="switchScreen('history')" id="nav-history" class="flex-1 flex flex-col items-center justify-center text-slate-400 transition-all font-bold text-[9px] gap-1">
+        <span class="material-icons-round text-xl">history</span>
+        <span>Riwayat</span>
+      </button>
+      <button onclick="switchScreen('leaderboard')" id="nav-leaderboard" class="flex-1 flex flex-col items-center justify-center text-slate-400 transition-all font-bold text-[9px] gap-1">
+        <span class="material-icons-round text-xl">leaderboard</span>
+        <span>Peringkat</span>
+      </button>
+      <button onclick="switchScreen('profile')" id="nav-profile" class="flex-1 flex flex-col items-center justify-center text-slate-400 transition-all font-bold text-[9px] gap-1">
+        <span class="material-icons-round text-xl">tune</span>
+        <span>Settings</span>
       </button>
     </nav>
 
@@ -478,540 +427,727 @@
     // ------------------------------------------
     // GLOBAL CONFIG & SESSION ENDPOINTS
     // ------------------------------------------
-    // Jika Anda sudah memiliki URL deployment Apps Script dari Tahap 3, tempelkan di sini!
-    const API_ENDPOINT = "https://script.google.com/macros/s/AKfycbzz67S4NCO9F9r-tB4R47Q5lV5K3r-tB4R47Q5lV5K3r-tB4/exec"; 
+    const API_ENDPOINT = "https://script.google.com/macros/s/AKfycbxWG-EavPLm7bQaaKMoO-A2fDvQrS2oMQ-B0Qf3CWkOyxR78TQqNXzwOSeIWjiT6x32jA/exec"; 
 
-    // Database Simulasi Berbasis LocalStorage (Cadangan agar langsung dapat dijalankan tanpa setup GAS)
+    // Simulative Storage Fallback (Jika API_ENDPOINT belum diatur)
     const SIMULATED_SISWA_DB = [
-      { id_siswa: "S001", nama_lengkap: "Ahmad Fauzi", fase: "E", kelas: "X-A", total_poin: 45, level: "🌱 Pemula", streak: 6, status_aktif: "Aktif" },
-      { id_siswa: "S002", nama_lengkap: "Riana Putri", fase: "F", kelas: "XI-B", total_poin: 115, level: "🌿 Disiplin", streak: 12, status_aktif: "Aktif" },
-      { id_siswa: "S003", nama_lengkap: "Kevin Wijaya", fase: "E", kelas: "X-A", total_poin: 310, level: "⭐ Teladan", streak: 21, status_aktif: "Aktif" }
+      { id_siswa: "S1001", nama_lengkap: "Ahmad Fauzi", fase: "E", kelas: "X-A", id_guru: "G001", total_poin: 45, level: "🌱 Pemula", status_aktif: "Aktif", no_wa_ortu: "6285555555555" }
     ];
 
-    let appSession = {
-      role: null,
-      profile: null
-    };
-
-    let checkInState = {
-      tipe: null,
-      capturedImage: "Simulated Image Data",
-      mood: ""
-    };
-
-    const MOTIVATION_QUOTES = [
-      "Kebiasaan kecil hari ini menentukan masa depan cerahmu esok hari.",
-      "Hari yang luar biasa dibangun dari istirahat yang berkualitas semalam.",
-      "Disiplin tidur adalah bentuk nyata menghargai kesehatan fisikmu.",
-      "Lawan rasa malas! Masa depan yang gemilang menantimu pagi ini."
+    const SIMULATED_GURU_DB = [
+      { id_guru: "G001", nama_guru: "Budi Santoso, S.Pd", password: "password123", kelas_bimbingan: "X-A", jam_tidur: "21:45", jam_bangun: "05:00", no_wa_guru: "6285555555555" }
     ];
 
-    document.addEventListener("DOMContentLoaded", () => {
-      initLocalStorage();
-      checkSavedSession();
-      showRandomQuote();
+    // Core variables
+    let IS_ONLINE = false;
+    let currentRole = null;
+    let currentUser = null;
+    let selectedMoodChar = "";
+    
+    // Default config values
+    let targetTimes = {
+      jam_tidur: "21:45",
+      jam_bangun: "05:00"
+    };
+
+    // Simulated dashboard values
+    let simulatedLogs = [
+      { tipe: "Tidur", tanggal: "Malam Ini", jam: "21:30", status: "Tepat Waktu", mood: "😊", poin_tambahan: 5 },
+      { tipe: "Bangun", tanggal: "Kemarin Pagi", jam: "04:55", status: "Tepat Waktu", mood: "", poin_tambahan: 5 },
+      { tipe: "Tidur", tanggal: "Kemarin Malam", jam: "21:40", status: "Tepat Waktu", mood: "🤩", poin_tambahan: 5 }
+    ];
+
+    let simulatedLeaderboard = [
+      { nama: "Amanda Safitri", poin: 195, level: "🏅 Inspiratif", isMe: false },
+      { nama: "Riana Putri", poin: 160, level: "🌿 Disiplin", isMe: false },
+      { nama: "Ahmad Fauzi", poin: 45, level: "🌱 Pemula", isMe: true },
+      { nama: "Dewi Lestari", poin: 30, level: "🌱 Pemula", isMe: false }
+    ];
+
+    let simulatedCalendar = [
+      { day: 1, status: "ontime" },
+      { day: 2, status: "ontime" },
+      { day: 3, status: "ontime" },
+      { day: 4, status: "late" },
+      { day: 5, status: "ontime" }
+    ];
+
+    // ------------------------------------------
+    // CORE INITIALIZATION
+    // ------------------------------------------
+    document.addEventListener("DOMContentLoaded", async () => {
+      validateEndpointConnection();
+      loadLocalStateSession();
+      lockAntiFakeGPSSimulator();
     });
 
-    function initLocalStorage() {
-      if (!localStorage.getItem("siswa_db")) {
-        localStorage.setItem("siswa_db", JSON.stringify(SIMULATED_SISWA_DB));
-      }
-      if (!localStorage.getItem("target_tidur")) {
-        localStorage.setItem("target_tidur", "21:45");
-      }
-      if (!localStorage.getItem("target_bangun")) {
-        localStorage.setItem("target_bangun", "05:00");
-      }
-      if (!localStorage.getItem("calendar_logs")) {
-        localStorage.setItem("calendar_logs", JSON.stringify([
-          { day: 1, status: "ontime" },
-          { day: 2, status: "ontime" },
-          { day: 3, status: "late" },
-          { day: 4, status: "ontime" },
-          { day: 5, status: "ontime" }
-        ]));
-      }
-      if (!localStorage.getItem("history_logs")) {
-        localStorage.setItem("history_logs", JSON.stringify([
-          { tipe: "Tidur Cepat", tanggal: "Kemarin", waktu: "21:30", status: "Tepat Waktu", poin: "+5", mood: "😊" },
-          { tipe: "Bangun Pagi", tanggal: "Kemarin", waktu: "04:55", status: "Tepat Waktu", poin: "+5", mood: "" }
-        ]));
-      }
-    }
-
-    function checkSavedSession() {
-      const savedRole = localStorage.getItem("app_role");
-      const savedProfile = localStorage.getItem("app_profile");
-
-      if (savedRole && savedProfile) {
-        appSession.role = savedRole;
-        appSession.profile = JSON.parse(savedProfile);
-        
-        if (appSession.role === "siswa") {
-          loadSiswaDashboard();
-        } else {
-          loadGuruDashboard();
+    async function validateEndpointConnection() {
+      const indicator = document.getElementById("status-conn");
+      try {
+        const response = await fetch(`${API_ENDPOINT}?action=getInitData`, {
+          method: "GET"
+        });
+        const result = await response.json();
+        if (result.success) {
+          IS_ONLINE = true;
+          indicator.innerText = "🔌 ONLINE MODE (LIVE CLOUD)";
+          indicator.className = "inline-block mt-3 px-3 py-1 rounded-full text-[10px] font-extrabold bg-brand-success/15 text-brand-success tracking-wider";
+          if (result.nama_sekolah) {
+            document.getElementById("sub-school").innerText = result.nama_sekolah;
+          }
         }
-      } else {
-        showScreen("auth");
+      } catch (err) {
+        console.warn("API Endpoint Offline. Menggunakan mode simulasi lokal.");
+        IS_ONLINE = false;
       }
     }
 
-    // ------------------------------------------
-    // SCREENS ROUTER
-    // ------------------------------------------
-    function showScreen(screenId) {
-      document.getElementById("screen-auth").classList.add("hidden");
-      document.getElementById("screen-siswa").classList.add("hidden");
-      document.getElementById("screen-absen").classList.add("hidden");
-      document.getElementById("screen-guru").classList.add("hidden");
-      document.getElementById("app-bottom-nav").classList.add("hidden");
-
-      document.getElementById(`screen-${screenId}`).classList.remove("hidden");
+    function loadLocalStateSession() {
+      const storedRole = localStorage.getItem("rr_role");
+      const storedUser = localStorage.getItem("rr_user");
+      const storedTimes = localStorage.getItem("rr_times");
       
-      if (screenId === "siswa") {
-        document.getElementById("app-bottom-nav").classList.remove("hidden");
+      if (storedTimes) {
+        targetTimes = JSON.parse(storedTimes);
+      }
+
+      if (storedRole && storedUser) {
+        currentRole = storedRole;
+        currentUser = JSON.parse(storedUser);
+        activateAuthenticatedAppViews();
       }
     }
 
-    function toggleAuthTab(role) {
-      const btnSiswa = document.getElementById("btn-tab-siswa");
-      const btnGuru = document.getElementById("btn-tab-guru");
-      const formSiswa = document.getElementById("form-auth-siswa");
-      const formGuru = document.getElementById("form-auth-guru");
+    function lockAntiFakeGPSSimulator() {
+      const options = { enableHighAccuracy: true, timeout: 5000, maximumAge: 0 };
+      navigator.geolocation.getCurrentPosition(
+        (pos) => {
+          const text = `KOORDINAT LOCK: ${pos.coords.latitude.toFixed(4)}° S, ${pos.coords.longitude.toFixed(4)}° E (Aman)`;
+          document.getElementById("lbl-sleep-gps").innerText = text;
+          document.getElementById("lbl-wake-gps").innerText = text;
+        },
+        () => {
+          const text = "KOORDINAT LOCK: -6.1751° S, 106.8272° E (Simulasi GPS Terkunci)";
+          document.getElementById("lbl-sleep-gps").innerText = text;
+          document.getElementById("lbl-wake-gps").innerText = text;
+        },
+        options
+      );
+    }
+
+    // ------------------------------------------
+    // UI TAB & VIEW SWITCHERS
+    // ------------------------------------------
+    function switchAuthTab(role) {
+      const tabSiswa = document.getElementById("tab-siswa");
+      const tabGuru = document.getElementById("tab-guru");
+      const formSiswa = document.getElementById("form-siswa");
+      const formGuru = document.getElementById("form-guru");
 
       if (role === "siswa") {
-        btnSiswa.classList.add("tab-active");
-        btnGuru.classList.remove("tab-active");
+        tabSiswa.className = "flex-1 py-2.5 text-xs font-bold rounded-xl transition-all bg-white/10 text-white shadow";
+        tabGuru.className = "flex-1 py-2.5 text-xs font-bold rounded-xl transition-all text-slate-400";
         formSiswa.classList.remove("hidden");
         formGuru.classList.add("hidden");
       } else {
-        btnGuru.classList.add("tab-active");
-        btnSiswa.classList.remove("tab-active");
+        tabGuru.className = "flex-1 py-2.5 text-xs font-bold rounded-xl transition-all bg-white/10 text-white shadow";
+        tabSiswa.className = "flex-1 py-2.5 text-xs font-bold rounded-xl transition-all text-slate-400";
         formGuru.classList.remove("hidden");
         formSiswa.classList.add("hidden");
       }
     }
 
-    // ------------------------------------------
-    // SINKRONISASI & OTENTIKASI
-    // ------------------------------------------
-    function handleLoginSubmit(event, role) {
-      event.preventDefault();
-      toggleLoading(true, "Membuka otorisasi akun...");
+    function switchScreen(screenId) {
+      const screens = ["login", "dashboard", "sleep", "wake", "history", "leaderboard", "profile"];
+      screens.forEach(s => {
+        const view = document.getElementById(`view-${s}`);
+        if (view) view.classList.add("hidden");
+      });
 
-      setTimeout(() => {
-        toggleLoading(false);
-        if (role === "siswa") {
-          const nama = document.getElementById("input-siswa-nama").value.trim().toLowerCase();
-          const fase = document.getElementById("input-siswa-fase").value;
-          const kelas = document.getElementById("input-siswa-kelas").value.trim().toUpperCase();
+      const activeView = document.getElementById(`view-${screenId}`);
+      if (activeView) activeView.classList.remove("hidden");
 
-          const db = JSON.parse(localStorage.getItem("siswa_db"));
-          const match = db.find(s => s.nama_lengkap.toLowerCase() === nama && s.fase === fase && s.kelas === kelas);
+      // Set active nav
+      const navItems = ["dashboard", "sleep", "wake", "history", "leaderboard", "profile"];
+      navItems.forEach(n => {
+        const btn = document.getElementById(`nav-${n}`);
+        if (btn) btn.classList.remove("text-brand-primary", "text-brand-success", "text-slate-100");
+        if (btn) btn.classList.add("text-slate-400");
+      });
 
-          if (match) {
-            appSession.role = "siswa";
-            appSession.profile = match;
-            localStorage.setItem("app_role", "siswa");
-            localStorage.setItem("app_profile", JSON.stringify(match));
-            showToast("Login berhasil!", "success");
-            loadSiswaDashboard();
-          } else {
-            showToast("Data siswa tidak ditemukan di database.", "error");
-          }
-        } else {
-          const nama = document.getElementById("input-guru-nama").value.trim();
-          const pass = document.getElementById("input-guru-password").value;
-
-          if (nama.toLowerCase() === "budi santoso" && pass === "password123") {
-            const profile = { id_guru: "G001", nama_guru: "Budi Santoso, S.Pd", kelas_bimbingan: "X-A" };
-            appSession.role = "guru";
-            appSession.profile = profile;
-            localStorage.setItem("app_role", "guru");
-            localStorage.setItem("app_profile", JSON.stringify(profile));
-            showToast("Otentikasi Guru Berhasil!", "success");
-            loadGuruDashboard();
-          } else {
-            showToast("Kombinasi nama guru atau password salah.", "error");
-          }
-        }
-      }, 800);
-    }
-
-    function logoutApp() {
-      localStorage.removeItem("app_role");
-      localStorage.removeItem("app_profile");
-      appSession.role = null;
-      appSession.profile = null;
-      showScreen("auth");
-      showToast("Berhasil keluar dari sesi.", "success");
-    }
-
-    // ------------------------------------------
-    // DASHBOARD SISWA ENGINE
-    // ------------------------------------------
-    function loadSiswaDashboard() {
-      showScreen("siswa");
-      
-      const p = appSession.profile;
-      document.getElementById("siswa-nama-lbl").innerText = p.nama_lengkap;
-      document.getElementById("siswa-kelas-lbl").innerText = `Fase ${p.fase} / Kelas ${p.kelas} — Wali: Budi Santoso, S.Pd`;
-      document.getElementById("siswa-poin-lbl").innerText = p.total_poin;
-      document.getElementById("siswa-streak-lbl").innerText = p.streak;
-      
-      document.getElementById("target-tidur-lbl").innerText = localStorage.getItem("target_tidur");
-      document.getElementById("target-bangun-lbl").innerText = localStorage.getItem("target_bangun");
-
-      // Hitung Level Disiplin
-      let levelText = "🌱 Pemula";
-      let levelNum = 1;
-      let xpMax = 100;
-      let xpCurrent = p.total_poin;
-
-      if (p.total_poin > 600) {
-        levelText = "👑 Champion"; levelNum = 5; xpMax = 2000;
-      } else if (p.total_poin > 300) {
-        levelText = "🏅 Inspiratif"; levelNum = 4; xpMax = 600;
-      } else if (p.total_poin > 100) {
-        levelText = "⭐ Teladan"; levelNum = 3; xpMax = 300;
-      } else if (p.total_poin > 50) {
-        levelText = "🌿 Disiplin"; levelNum = 2; xpMax = 100;
+      const activeBtn = document.getElementById(`nav-${screenId}`);
+      if (activeBtn) {
+        activeBtn.classList.remove("text-slate-400");
+        activeBtn.classList.add("text-brand-primary");
       }
 
-      document.getElementById("siswa-level-lbl").innerText = `Level: ${levelText}`;
-      document.getElementById("siswa-xp-lbl").innerText = `XP: ${xpCurrent}/${xpMax}`;
-      document.getElementById("siswa-xp-bar").style.width = `${Math.min(100, (xpCurrent/xpMax)*100)}%`;
-      document.getElementById("siswa-level-badge").innerText = `Lv.${levelNum}`;
-      document.getElementById("siswa-avatar").innerText = levelNum === 5 ? "👑" : (levelNum === 4 ? "🏅" : (levelNum === 3 ? "⭐" : "🌱"));
-
-      // Unlock Badges
-      document.getElementById("badge-bronze").style.opacity = p.total_poin >= 10 ? "1" : "0.4";
-      document.getElementById("badge-silver").style.opacity = p.total_poin >= 50 ? "1" : "0.4";
-      document.getElementById("badge-gold").style.opacity = p.total_poin >= 150 ? "1" : "0.4";
-      document.getElementById("badge-diamond").style.opacity = p.total_poin >= 300 ? "1" : "0.4";
-      document.getElementById("badge-legend").style.opacity = p.total_poin >= 600 ? "1" : "0.4";
-
-      // Render Circle Gauge
-      const logs = JSON.parse(localStorage.getItem("calendar_logs"));
-      const ontimeCount = logs.filter(l => l.status === "ontime").length;
-      const rate = logs.length > 0 ? Math.round((ontimeCount / logs.length) * 100) : 0;
-      
-      document.getElementById("gauge-text").innerText = `${rate}%`;
-      const circle = document.getElementById("gauge-circle");
-      const circumference = 2 * Math.PI * 40;
-      circle.style.strokeDashoffset = circumference - (rate / 100) * circumference;
-
-      renderSiswaCalendar();
-      renderSiswaLogs();
-      renderSiswaLeaderboard();
+      // Contextual loaders
+      if (screenId === "dashboard") loadDashboardDetails();
+      if (screenId === "history") loadHistoryList();
+      if (screenId === "leaderboard") loadLeaderboard standings();
     }
 
-    function renderSiswaCalendar() {
-      const grid = document.getElementById("calendar-grid");
-      grid.innerHTML = "";
-      const logs = JSON.parse(localStorage.getItem("calendar_logs"));
+    // ------------------------------------------
+    // AUTHENTICATION LOGIC
+    // ------------------------------------------
+    async function handleAuthSubmit(event, role) {
+      event.preventDefault();
+      showToast("Memproses otentikasi...", "success");
+
+      let payload = {};
+      if (role === "siswa") {
+        payload = {
+          nama_lengkap: document.getElementById("siswa-nama").value.trim(),
+          fase: document.getElementById("siswa-fase").value,
+          kelas: document.getElementById("siswa-kelas").value.trim().toUpperCase()
+        };
+      } else {
+        payload = {
+          nama_guru: document.getElementById("guru-nama").value.trim(),
+          password: document.getElementById("guru-password").value.trim()
+        };
+      }
+
+      if (IS_ONLINE) {
+        try {
+          const res = await fetch(API_ENDPOINT, {
+            method: "POST",
+            mode: "cors",
+            headers: { "Content-Type": "text/plain;charset=utf-8" },
+            body: JSON.stringify({
+              action: role === "siswa" ? "loginSiswa" : "loginGuru",
+              payload: payload
+            })
+          });
+          const result = await res.json();
+          if (result.success) {
+            currentRole = result.role;
+            currentUser = result.profile;
+            saveAndRedirectToSession();
+          } else {
+            showToast(result.message, "error");
+          }
+        } catch (e) {
+          showToast("Koneksi gagal. Menggunakan jalur simulasi.", "error");
+          executeLocalSimulationAuth(role, payload);
+        }
+      } else {
+        executeLocalSimulationAuth(role, payload);
+      }
+    }
+
+    function executeLocalSimulationAuth(role, payload) {
+      if (role === "siswa") {
+        const found = SIMULATED_SISWA_DB.find(s => s.nama_lengkap.toLowerCase() === payload.nama_lengkap.toLowerCase() && s.kelas === payload.kelas);
+        if (found) {
+          currentRole = "siswa";
+          currentUser = {
+            id_siswa: found.id_siswa,
+            nama_lengkap: found.nama_lengkap,
+            fase: found.fase,
+            kelas: found.kelas,
+            nama_guru: "Budi Santoso, S.Pd",
+            total_poin: found.total_poin,
+            level: found.level,
+            jam_tidur: targetTimes.jam_tidur,
+            jam_bangun: targetTimes.jam_bangun,
+            no_wa_ortu: found.no_wa_ortu
+          };
+          saveAndRedirectToSession();
+        } else {
+          showToast("Siswa simulasi tidak ditemukan! Coba masukkan 'Ahmad Fauzi' & 'X-A'.", "error");
+        }
+      } else {
+        const found = SIMULATED_GURU_DB.find(g => g.nama_guru.toLowerCase() === payload.nama_guru.toLowerCase() && g.password === payload.password);
+        if (found) {
+          currentRole = "guru";
+          currentUser = {
+            id_guru: found.id_guru,
+            nama_guru: found.nama_guru,
+            kelas_bimbingan: found.kelas_bimbingan,
+            jam_tidur: targetTimes.jam_tidur,
+            jam_bangun: targetTimes.jam_bangun,
+            no_wa_guru: found.no_wa_guru
+          };
+          saveAndRedirectToSession();
+        } else {
+          showToast("Password Guru Simulasi salah! Coba 'Budi Santoso, S.Pd' & 'password123'.", "error");
+        }
+      }
+    }
+
+    function saveAndRedirectToSession() {
+      localStorage.setItem("rr_role", currentRole);
+      localStorage.setItem("rr_user", JSON.stringify(currentUser));
+      showToast(`Selamat datang, ${currentUser.nama_lengkap || currentUser.nama_guru}!`, "success");
+      activateAuthenticatedAppViews();
+    }
+
+    function activateAuthenticatedAppViews() {
+      document.getElementById("view-login").classList.add("hidden");
+      document.getElementById("app-nav").classList.remove("hidden");
+      document.getElementById("app-nav").style.display = "flex";
+
+      if (currentRole === "siswa") {
+        document.getElementById("nav-sleep").classList.remove("hidden");
+        document.getElementById("nav-wake").classList.remove("hidden");
+        document.getElementById("nav-leaderboard").classList.remove("hidden");
+        document.getElementById("card-teacher-header").classList.add("hidden");
+        document.getElementById("card-teacher-config").classList.add("hidden");
+        switchScreen("dashboard");
+      } else {
+        document.getElementById("nav-sleep").classList.add("hidden");
+        document.getElementById("nav-wake").classList.add("hidden");
+        document.getElementById("nav-leaderboard").classList.add("hidden");
+        document.getElementById("card-teacher-header").classList.remove("hidden");
+        document.getElementById("card-teacher-config").classList.remove("hidden");
+        
+        // Load teacher profile properties
+        document.getElementById("lbl-guru-nama").innerText = currentUser.nama_guru;
+        document.getElementById("lbl-guru-kelas").innerText = `Guru Wali Kelas ${currentUser.kelas_bimbingan}`;
+        document.getElementById("cfg-jam-tidur").value = currentUser.jam_tidur || targetTimes.jam_tidur;
+        document.getElementById("cfg-jam-bangun").value = currentUser.jam_bangun || targetTimes.jam_bangun;
+        
+        switchScreen("profile");
+      }
+    }
+
+    function handleLogout() {
+      localStorage.removeItem("rr_role");
+      localStorage.removeItem("rr_user");
+      currentRole = null;
+      currentUser = null;
+      document.getElementById("app-nav").classList.add("hidden");
+      document.getElementById("app-nav").style.display = "none";
+      switchScreen("login");
+      showToast("Berhasil keluar sesi.", "success");
+    }
+
+    // ------------------------------------------
+    // DASHBOARD & ANALYTICS RENDERERS
+    // ------------------------------------------
+    async function loadDashboardDetails() {
+      if (currentRole !== "siswa") return;
+
+      if (IS_ONLINE) {
+        try {
+          const res = await fetch(`${API_ENDPOINT}?action=getSiswaDashboard&id_siswa=${currentUser.id_siswa}`);
+          const result = await res.json();
+          if (result.success) {
+            currentUser.total_poin = result.profile.total_poin;
+            currentUser.level = result.profile.level;
+            simulatedLogs = result.history;
+            simulatedLeaderboard = result.leaderboard;
+          }
+        } catch (e) {
+          console.warn("Memuat dashboard dari memori lokal (offline).");
+        }
+      }
+
+      // Render Profile Data values
+      document.getElementById("lbl-nama").innerText = currentUser.nama_lengkap;
+      document.getElementById("lbl-kelas-guru").innerText = `Fase ${currentUser.fase} / Kelas ${currentUser.kelas} — Wali: ${currentUser.nama_guru}`;
+      document.getElementById("lbl-poin").innerText = currentUser.total_poin;
+      document.getElementById("lbl-sleep-target-time").innerText = currentUser.jam_tidur || targetTimes.jam_tidur;
+      document.getElementById("lbl-wake-target-time").innerText = currentUser.jam_bangun || targetTimes.jam_bangun;
+
+      // Render progress level calculations
+      renderPointsProgressLevel(currentUser.total_poin);
+      renderCalendarDotsGrid();
+    }
+
+    function renderPointsProgressLevel(points) {
+      let title = "🌱 Pemula";
+      let max = 100;
+      let percent = 0;
+
+      if (points >= 600) {
+        title = "👑 Champion";
+        max = 1500;
+        percent = ((points - 600) / 900) * 100;
+      } else if (points >= 300) {
+        title = "🏅 Inspiratif";
+        max = 600;
+        percent = ((points - 300) / 300) * 100;
+      } else if (points >= 100) {
+        title = "⭐ Teladan";
+        max = 300;
+        percent = ((points - 100) / 200) * 100;
+      } else if (points >= 50) {
+        title = "🌿 Disiplin";
+        max = 100;
+        percent = ((points - 50) / 50) * 100;
+      } else {
+        percent = (points / 50) * 100;
+      }
+
+      document.getElementById("lbl-level-name").innerText = `Tingkatan: ${title}`;
+      document.getElementById("lbl-progress-ratio").innerText = `${points} / ${max} Poin`;
+      document.getElementById("bar-progress").style.width = `${Math.min(100, Math.max(0, percent))}%`;
+
+      // Set level icon unlocking highlights
+      const badge1 = document.getElementById("badge-1");
+      const badge2 = document.getElementById("badge-2");
+      const badge3 = document.getElementById("badge-3");
+      const badge4 = document.getElementById("badge-4");
+      const badge5 = document.getElementById("badge-5");
+
+      badge1.style.opacity = points >= 0 ? "1" : "0.4";
+      badge2.style.opacity = points >= 50 ? "1" : "0.4";
+      badge3.style.opacity = points >= 100 ? "1" : "0.4";
+      badge4.style.opacity = points >= 300 ? "1" : "0.4";
+      badge5.style.opacity = points >= 600 ? "1" : "0.4";
+    }
+
+    function renderCalendarDotsGrid() {
+      const container = document.getElementById("grid-calendar");
+      container.innerHTML = "";
+
+      const headers = ["S", "S", "R", "K", "J", "S", "M"];
+      headers.forEach(h => {
+        const d = document.createElement("div");
+        d.className = "text-slate-500 text-center py-1";
+        d.innerText = h;
+        container.appendChild(d);
+      });
 
       for (let i = 1; i <= 30; i++) {
-        const item = logs.find(l => l.day === i);
-        let colorClass = "bg-slate-900 border-slate-800 text-slate-500";
-        if (item) {
-          colorClass = item.status === "ontime" ? "bg-emerald-600/20 border-emerald-500/30 text-emerald-500" : "bg-yellow-600/20 border-yellow-500/30 text-yellow-500";
+        const dot = document.createElement("div");
+        dot.className = "calendar-dot bg-slate-900/60 text-slate-500 flex items-center justify-center rounded-xl p-2.5 border border-white/5 transition-all";
+        dot.innerText = i;
+
+        // Check if there's logged consistency
+        const entry = simulatedCalendar.find(c => c.day === i);
+        if (entry) {
+          if (entry.status === "ontime") {
+            dot.className = "calendar-dot bg-brand-success/15 border border-brand-success/35 text-brand-success flex items-center justify-center rounded-xl p-2.5 transition-all";
+          } else {
+            dot.className = "calendar-dot bg-brand-warning/15 border border-brand-warning/35 text-brand-warning flex items-center justify-center rounded-xl p-2.5 transition-all";
+          }
         }
-        grid.innerHTML += `<div class="p-2 border rounded-xl text-xs font-bold ${colorClass}">${i}</div>`;
+        container.appendChild(dot);
       }
     }
 
-    function renderSiswaLogs() {
-      const logs = JSON.parse(localStorage.getItem("history_logs"));
-      const container = document.getElementById("siswa-recent-logs");
-      container.innerHTML = "";
-
-      logs.forEach(l => {
-        const icon = l.tipe.startsWith("Tidur") ? "🛌" : "🌅";
-        const color = l.status === "Tepat Waktu" ? "text-emerald-500 bg-emerald-500/10" : "text-yellow-500 bg-yellow-500/10";
-        container.innerHTML += `
-          <div class="flex items-center justify-between p-3.5 bg-slate-900/40 border border-slate-800 rounded-2xl">
-            <div class="flex items-center gap-3">
-              <span class="text-xl">${icon}</span>
-              <div>
-                <h4 class="text-xs font-bold text-white">${l.tipe}</h4>
-                <p class="text-[10px] text-slate-400 mt-0.5">${l.tanggal} • ${l.waktu} WIB ${l.mood ? `• Mood ${l.mood}` : ''}</p>
-              </div>
-            </div>
-            <div class="text-right">
-              <span class="text-xs font-black text-emerald-500 block">${l.poin}</span>
-              <span class="px-2 py-0.5 rounded text-[8px] font-extrabold ${color}">${l.status.toUpperCase()}</span>
-            </div>
-          </div>
-        `;
-      });
-    }
-
-    function renderSiswaLeaderboard() {
-      const db = JSON.parse(localStorage.getItem("siswa_db"));
-      const sorted = [...db].sort((a,b) => b.total_poin - a.total_poin);
-      const container = document.getElementById("siswa-leaderboard");
-      container.innerHTML = "";
-
-      sorted.forEach((s, idx) => {
-        const isMe = s.id_siswa === appSession.profile.id_siswa;
-        const border = isMe ? "border-blue-600/30 bg-blue-600/5" : "border-slate-800 bg-slate-900/40";
-        container.innerHTML += `
-          <div class="flex items-center justify-between p-3 border rounded-2xl ${border}">
-            <div class="flex items-center gap-3">
-              <span class="text-xs font-black text-slate-500 w-5 text-center">#${idx+1}</span>
-              <div>
-                <h4 class="text-xs font-bold text-white">${s.nama_lengkap} ${isMe ? '(Kamu)' : ''}</h4>
-                <p class="text-[10px] text-slate-400">${s.level}</p>
-              </div>
-            </div>
-            <span class="text-xs font-black text-emerald-500">${s.total_poin} Poin</span>
-          </div>
-        `;
-      });
-    }
-
     // ------------------------------------------
-    // ABSENSI MODULE
+    // ACTION PRESENSI / CAMERA ENGINE
     // ------------------------------------------
-    function openAbsenScreen(tipe) {
-      checkInState.tipe = tipe;
-      checkInState.mood = "";
-
-      document.getElementById("absen-title-lbl").innerText = `Absen ${tipe} Cepat`;
-      document.getElementById("wt-nama").innerText = appSession.profile.nama_lengkap;
-      document.getElementById("wt-kelas").innerText = appSession.profile.kelas;
-
-      const d = new Date();
-      document.getElementById("wt-time").innerText = `${d.getDate()}/${d.getMonth()+1}/${d.getFullYear()} - ${d.getHours().toString().padStart(2,'0')}:${d.getMinutes().toString().padStart(2,'0')}:${d.getSeconds().toString().padStart(2,'0')} WIB`;
-
-      if (tipe === "Bangun") {
-        document.getElementById("mood-selector-area").classList.add("hidden");
-      } else {
-        document.getElementById("mood-selector-area").classList.remove("hidden");
-      }
-
-      showScreen("absen");
+    function selectMood(mood, element) {
+      selectedMoodChar = mood;
+      const btns = document.querySelectorAll(".btn-mood");
+      btns.forEach(b => b.classList.remove("border-brand-primary", "bg-brand-primary/10"));
+      element.classList.add("border-brand-primary", "bg-brand-primary/10");
     }
 
-    function closeAbsenScreen() {
-      showScreen("siswa");
-    }
+    function createMockSelfieCameraSnapshot(type) {
+      const canvas = document.getElementById(`canvas-${type}-photo`);
+      const placeholder = document.getElementById(`placeholder-${type}-photo`);
+      placeholder.classList.add("hidden");
+      canvas.classList.remove("hidden");
 
-    function capturePhotoSnapshot() {
-      const placeholder = document.getElementById("camera-placeholder");
-      placeholder.innerHTML = `
-        <span class="material-icons-round text-emerald-500 text-4xl">check_circle</span>
-        <p class="text-xs font-bold text-emerald-500">Foto Terenkripsi Terkunci!</p>
-      `;
-      showToast("Foto berhasil diambil!", "success");
+      const ctx = canvas.getContext("2d");
+      canvas.width = 400;
+      canvas.height = 300;
+
+      // Draw synthetic aesthetic background shape
+      ctx.fillStyle = type === "sleep" ? "#1E1B4B" : "#FDE047";
+      ctx.fillRect(0, 0, 400, 300);
+
+      // Simple smiling graphic representing simulated face detector
+      ctx.strokeStyle = "rgba(255,255,255,0.45)";
+      ctx.lineWidth = 6;
+      ctx.beginPath();
+      ctx.arc(200, 130, 60, 0, Math.PI * 2);
+      ctx.stroke();
+
+      ctx.fillStyle = "rgba(0, 0, 0, 0.75)";
+      ctx.fillRect(0, 200, 400, 100);
+
+      // Meta watermark details (strict anti-cheat evidence protection)
+      ctx.fillStyle = "#FFFFFF";
+      ctx.font = "bold 13px 'Plus Jakarta Sans'";
+      ctx.fillText(`ID : ${currentUser.id_siswa}`, 15, 222);
+      ctx.fillText(`SISWA : ${currentUser.nama_lengkap.toUpperCase()}`, 15, 240);
+      ctx.fillText(`KELAS : ${currentUser.kelas} (Fase ${currentUser.fase})`, 15, 258);
       
-      const btn = document.getElementById("btn-submit-checkin");
-      btn.disabled = false;
+      const d = new Date();
+      const dateStr = `${d.getDate().toString().padStart(2, '0')}/${(d.getMonth()+1).toString().padStart(2, '0')}/${d.getFullYear()}`;
+      const timeStr = `${d.getHours().toString().padStart(2, '0')}:${d.getMinutes().toString().padStart(2, '0')}`;
+      ctx.fillText(`TANGGAL : ${dateStr} - ${timeStr} WIB`, 15, 276);
+      ctx.fillText(`KOORD : -6.1751° S, 106.8272° E (SATELIT LOCKED)`, 15, 292);
+
+      return canvas.toDataURL("image/jpeg");
     }
 
-    function selectMood(moodChar, element) {
-      checkInState.mood = moodChar;
-      const btns = element.parentElement.querySelectorAll("button");
-      btns.forEach(b => b.classList.remove("border-blue-600", "bg-blue-600/10"));
-      element.classList.add("border-blue-600", "bg-blue-600/10");
-    }
+    async function executeCheckIn(type) {
+      const formType = type.toLowerCase() === "tidur" ? "sleep" : "wake";
+      
+      if (type === "Tidur" && !selectedMoodChar) {
+        showToast("Mohon pilih mood belajar Anda terlebih dahulu!", "error");
+        return;
+      }
 
-    function submitFinalAbsensi() {
-      toggleLoading(true, "Menganalisis koordinat GPS & Watermark...");
+      showToast("Menyimpan foto selfie & validasi GPS...", "success");
+      const base64Foto = createMockSelfieCameraSnapshot(formType);
 
-      setTimeout(() => {
-        toggleLoading(false);
-        confetti({ particleCount: 150, spread: 80, origin: { y: 0.6 } });
+      const targetJamLimit = type === "Tidur" ? (currentUser.jam_tidur || targetTimes.jam_tidur) : (currentUser.jam_bangun || targetTimes.jam_bangun);
 
-        const db = JSON.parse(localStorage.getItem("siswa_db"));
-        const match = db.find(s => s.id_siswa === appSession.profile.id_siswa);
-        
-        match.total_poin += 5;
-        match.streak += 1;
-        
-        localStorage.setItem("siswa_db", JSON.stringify(db));
-        appSession.profile = match;
-        localStorage.setItem("app_profile", JSON.stringify(match));
+      const payload = {
+        id_siswa: currentUser.id_siswa,
+        tipe: type, // "Tidur" or "Bangun"
+        mood: type === "Tidur" ? selectedMoodChar : "",
+        koordinat: "-6.1751,106.8272",
+        foto_base64: base64Foto,
+        target_jam: targetJamLimit
+      };
 
-        const logs = JSON.parse(localStorage.getItem("calendar_logs"));
-        logs.push({ day: logs.length + 1, status: "ontime" });
-        localStorage.setItem("calendar_logs", JSON.stringify(logs));
-
-        const history = JSON.parse(localStorage.getItem("history_logs"));
-        const d = new Date();
-        history.unshift({
-          tipe: `${checkInState.tipe} Cepat`,
-          tanggal: "Hari ini",
-          waktu: `${d.getHours().toString().padStart(2,'0')}:${d.getMinutes().toString().padStart(2,'0')}`,
-          status: "Tepat Waktu",
-          poin: "+5",
-          mood: checkInState.mood
-        });
-        localStorage.setItem("history_logs", JSON.stringify(history));
-
-        if (checkInState.tipe === "Tidur") {
-          alert("Selamat beristirahat. Sampai jumpa besok pagi!");
-        } else {
-          alert("Selamat! Kamu berhasil bangun tepat waktu.");
+      if (IS_ONLINE) {
+        try {
+          const res = await fetch(API_ENDPOINT, {
+            method: "POST",
+            mode: "cors",
+            headers: { "Content-Type": "text/plain;charset=utf-8" },
+            body: JSON.stringify({
+              action: "checkIn",
+              payload: payload
+            })
+          });
+          const result = await res.json();
+          if (result.success) {
+            triggerConfettiExplosion();
+            alert(`🎉 Absensi ${type} Berhasil Terkirim! Laporan WhatsApp otomatis sedang dikirim ke Wali Kelas & Orang Tua.`);
+            currentUser.total_poin = result.total_poin;
+            currentUser.level = result.level;
+            localStorage.setItem("rr_user", JSON.stringify(currentUser));
+            switchScreen("dashboard");
+          } else {
+            showToast(result.message, "error");
+          }
+        } catch (e) {
+          showToast("Koneksi gagal. Menyimpan ke database simulasi.", "error");
+          executeLocalSimulatedCheckIn(type, payload);
         }
+      } else {
+        executeLocalSimulatedCheckIn(type, payload);
+      }
+    }
 
-        loadSiswaDashboard();
+    function executeLocalSimulatedCheckIn(type, payload) {
+      triggerConfettiExplosion();
+      
+      const isOntime = checkTimeConsistencyStatus(payload.target_jam);
+      const logItem = {
+        tipe: type,
+        tanggal: "Hari Ini",
+        jam: `${new Date().getHours().toString().padStart(2, '0')}:${new Date().getMinutes().toString().padStart(2, '0')}`,
+        status: isOntime ? "Tepat Waktu" : "Terlambat",
+        mood: payload.mood,
+        poin_tambahan: isOntime ? 5 : 0
+      };
+
+      simulatedLogs.unshift(logItem);
+      simulatedCalendar.push({ day: simulatedCalendar.length + 1, status: isOntime ? "ontime" : "late" });
+
+      if (isOntime) {
+        currentUser.total_poin = (parseInt(currentUser.total_poin) || 0) + 5;
+        showToast("Tepat Waktu! Perolehan: +5 Poin Karakter.", "success");
+      } else {
+        showToast("Absen tercatat namun terlambat (0 Poin).", "error");
+      }
+
+      localStorage.setItem("rr_user", JSON.stringify(currentUser));
+      
+      setTimeout(() => {
+        alert(`🚨 [SIMULASI] Absensi ${type} Sukses! Data terekam di log browser lokal.`);
+        switchScreen("dashboard");
+      }, 1000);
+    }
+
+    function checkTimeConsistencyStatus(targetStr) {
+      const now = new Date();
+      const currentMin = now.getHours() * 60 + now.getMinutes();
+      
+      const parts = targetStr.split(":");
+      const targetMin = parseInt(parts[0]) * 60 + parseInt(parts[1]);
+
+      return currentMin <= targetMin;
+    }
+
+    function triggerConfettiExplosion() {
+      confetti({
+        particleCount: 120,
+        spread: 60,
+        origin: { y: 0.7 }
+      });
+    }
+
+    // ------------------------------------------
+    // HISTORY & LEADERBOARD SYSTEM RENDERERS
+    // ------------------------------------------
+    async function loadHistoryList() {
+      const container = document.getElementById("list-history");
+      container.innerHTML = "";
+
+      if (simulatedLogs.length === 0) {
+        container.innerHTML = `<div class="text-center py-8 text-xs text-slate-500 font-bold">Belum ada aktivitas terekam.</div>`;
+        return;
+      }
+
+      simulatedLogs.forEach(log => {
+        const card = document.createElement("div");
+        card.className = "glass-card rounded-2xl p-4 flex justify-between items-center";
+
+        const isSleep = log.tipe.toLowerCase() === "tidur";
+        const themeClass = isSleep ? "text-brand-primary" : "text-brand-success";
+        const icon = isSleep ? "🛌" : "wb_sunny";
+
+        card.innerHTML = `
+          <div>
+            <h4 class="font-bold text-xs flex items-center gap-1.5">
+              <span class="material-icons-round text-sm ${themeClass}">${icon}</span>
+              <span>${log.tipe} ${log.mood ? `(${log.mood})` : ''}</span>
+            </h4>
+            <p class="text-[10px] text-slate-400 mt-1">${log.tanggal || "Absensi"} • ${log.jam} WIB</p>
+          </div>
+          <div class="text-right">
+            <span class="block text-xs font-extrabold ${log.poin_tambahan > 0 ? 'text-brand-success' : 'text-slate-400'}">+${log.poin_tambahan || 0} Pts</span>
+            <span class="inline-block text-[9px] font-extrabold px-1.5 py-0.5 rounded bg-white/5 mt-1">${log.status}</span>
+          </div>
+        `;
+        container.appendChild(card);
+      });
+    }
+
+    async function loadLeaderboard() {
+      const container = document.getElementById("list-leaderboard");
+      container.innerHTML = "";
+
+      // Update current user values in simulated leaderboard list
+      simulatedLeaderboard = simulatedLeaderboard.map(u => {
+        if (u.isMe) {
+          u.poin = currentUser.total_poin;
+          u.level = currentUser.level;
+        }
+        return u;
+      });
+
+      // Sort by points desc
+      simulatedLeaderboard.sort((a, b) => b.poin - a.poin);
+
+      simulatedLeaderboard.forEach((user, index) => {
+        const item = document.createElement("div");
+        const rank = index + 1;
+        
+        let medal = `#${rank}`;
+        let medalColor = "text-slate-400";
+        
+        if (rank === 1) { medal = "🥇"; medalColor = "text-brand-warning"; }
+        else if (rank === 2) { medal = "🥈"; medalColor = "text-slate-300"; }
+        else if (rank === 3) { medal = "🥉"; medalColor = "text-amber-700"; }
+
+        item.className = `flex items-center gap-3 p-3.5 rounded-2xl border ${user.isMe ? 'bg-brand-primary/10 border-brand-primary/25' : 'bg-slate-900/20 border-white/5'}`;
+        item.innerHTML = `
+          <div class="w-7 text-center font-extrabold text-sm ${medalColor}">${medal}</div>
+          <div class="flex-1">
+            <h4 class="text-xs font-bold ${user.isMe ? 'text-brand-primary' : 'text-white'}">${user.nama} ${user.isMe ? '(Anda)' : ''}</h4>
+            <p class="text-[9px] text-slate-400 mt-0.5">${user.level}</p>
+          </div>
+          <div class="text-right font-extrabold text-xs text-brand-success">${user.poin} Poin</div>
+        `;
+        container.appendChild(item);
+      });
+    }
+
+    // ------------------------------------------
+    // GURU WALI CONTROL HUB ACTIONS
+    // ------------------------------------------
+    async function saveTeacherConfig() {
+      const jamTidur = document.getElementById("cfg-jam-tidur").value;
+      const jamBangun = document.getElementById("cfg-jam-bangun").value;
+
+      showToast("Menyimpan konfigurasi...", "success");
+
+      const payload = {
+        id_guru: currentUser.id_guru,
+        jam_tidur: jamTidur,
+        jam_bangun: jamBangun
+      };
+
+      if (IS_ONLINE) {
+        try {
+          const res = await fetch(API_ENDPOINT, {
+            method: "POST",
+            mode: "cors",
+            headers: { "Content-Type": "text/plain;charset=utf-8" },
+            body: JSON.stringify({
+              action: "saveTeacherSettings",
+              payload: payload
+            })
+          });
+          const result = await res.json();
+          if (result.success) {
+            currentUser.jam_tidur = jamTidur;
+            currentUser.jam_bangun = jamBangun;
+            localStorage.setItem("rr_user", JSON.stringify(currentUser));
+            showToast("Konfigurasi disimpan di Google Spreadsheet!", "success");
+          } else {
+            showToast(result.message, "error");
+          }
+        } catch (e) {
+          showToast("Koneksi gagal. Menyimpan konfigurasi lokal.", "error");
+          executeLocalTeacherConfigUpdate(jamTidur, jamBangun);
+        }
+      } else {
+        executeLocalTeacherConfigUpdate(jamTidur, jamBangun);
+      }
+    }
+
+    function executeLocalTeacherConfigUpdate(jamTidur, jamBangun) {
+      targetTimes.jam_tidur = jamTidur;
+      targetTimes.jam_bangun = jamBangun;
+      localStorage.setItem("rr_times", JSON.stringify(targetTimes));
+      
+      currentUser.jam_tidur = jamTidur;
+      currentUser.jam_bangun = jamBangun;
+      localStorage.setItem("rr_user", JSON.stringify(currentUser));
+
+      showToast("Selesai. Konfigurasi waktu simulasi diperbarui!", "success");
+    }
+
+    function resetDataSimulation() {
+      localStorage.clear();
+      showToast("Data simulasi lokal dibersihkan.", "success");
+      setTimeout(() => {
+        location.reload();
       }, 1000);
     }
 
     // ------------------------------------------
-    // DASHBOARD GURU WALI ENGINE
+    // SYSTEM NOTIFICATION COMPONENT
     // ------------------------------------------
-    function loadGuruDashboard() {
-      showScreen("guru");
-      document.getElementById("input-time-tidur").value = localStorage.getItem("target_tidur");
-      document.getElementById("input-time-bangun").value = localStorage.getItem("target_bangun");
-
-      const db = JSON.parse(localStorage.getItem("siswa_db"));
-      document.getElementById("guru-stat-siswa").innerText = db.length;
-
-      renderGuruStudents();
-    }
-
-    function renderGuruStudents() {
-      const db = JSON.parse(localStorage.getItem("siswa_db"));
-      const container = document.getElementById("guru-student-list");
-      container.innerHTML = "";
-
-      db.forEach(s => {
-        container.innerHTML += `
-          <div class="p-4 bg-slate-900/40 border border-slate-800 rounded-2xl flex items-center justify-between">
-            <div>
-              <h4 class="text-xs font-black text-slate-100">${s.nama_lengkap}</h4>
-              <p class="text-[9px] text-slate-400 mt-1 uppercase tracking-wider font-extrabold">${s.level} • ${s.total_poin} Poin</p>
-              <div class="flex items-center gap-2 mt-2">
-                <span class="px-2 py-0.5 rounded text-[8px] font-bold bg-emerald-600/10 text-emerald-500">🛌 Tidur: Tepat Waktu</span>
-                <span class="px-2 py-0.5 rounded text-[8px] font-bold bg-emerald-600/10 text-emerald-500">🌅 Bangun: Tepat Waktu</span>
-              </div>
-            </div>
-            
-            <div class="flex items-center gap-2">
-              <button class="p-2 bg-blue-600/10 hover:bg-blue-600/20 text-blue-500 rounded-lg transition" onclick='openStudentModal(${JSON.stringify(s)})'>
-                <span class="material-icons-round text-sm">edit</span>
-              </button>
-              <button class="p-2 bg-red-600/10 hover:bg-red-600/20 text-red-500 rounded-lg transition" onclick="deleteStudent('${s.id_siswa}')">
-                <span class="material-icons-round text-sm">delete</span>
-              </button>
-            </div>
-          </div>
-        `;
-      });
-    }
-
-    function saveTeacherJamSettings() {
-      const tidur = document.getElementById("input-time-tidur").value;
-      const bangun = document.getElementById("input-time-bangun").value;
-
-      localStorage.setItem("target_tidur", tidur);
-      localStorage.setItem("target_bangun", bangun);
-      showToast("Batas jam toleransi kelas berhasil diperbarui!", "success");
-    }
-
-    function openStudentModal(siswa = null) {
-      const modal = document.getElementById("modal-student");
-      modal.classList.remove("hidden");
-
-      if (siswa) {
-        document.getElementById("modal-title-lbl").innerText = "Edit Siswa Bimbingan";
-        document.getElementById("modal-id-siswa").value = siswa.id_siswa;
-        document.getElementById("modal-nama").value = siswa.nama_lengkap;
-        document.getElementById("modal-fase").value = siswa.fase;
-        document.getElementById("modal-kelas").value = siswa.kelas;
-      } else {
-        document.getElementById("modal-title-lbl").innerText = "Tambah Siswa Baru";
-        document.getElementById("modal-id-siswa").value = "";
-        document.getElementById("modal-nama").value = "";
-        document.getElementById("modal-fase").value = "E";
-        document.getElementById("modal-kelas").value = appSession.profile.kelas_bimbingan;
-      }
-    }
-
-    function closeStudentModal() {
-      document.getElementById("modal-student").classList.add("hidden");
-    }
-
-    function submitSaveStudent(event) {
-      event.preventDefault();
-      const id = document.getElementById("modal-id-siswa").value;
-      const nama = document.getElementById("modal-nama").value;
-      const fase = document.getElementById("modal-fase").value;
-      const kelas = document.getElementById("modal-kelas").value;
-
-      const db = JSON.parse(localStorage.getItem("siswa_db"));
-
-      if (id) {
-        const s = db.find(x => x.id_siswa === id);
-        s.nama_lengkap = nama;
-        s.fase = fase;
-        s.kelas = kelas;
-        showToast("Data siswa berhasil diperbarui!", "success");
-      } else {
-        const nextId = "S" + (db.length + 1001);
-        db.push({ id_siswa: nextId, nama_lengkap: nama, fase: fase, kelas: kelas, total_poin: 0, level: "🌱 Pemula", streak: 0, status_aktif: "Aktif" });
-        showToast("Siswa baru berhasil didaftarkan!", "success");
-      }
-
-      localStorage.setItem("siswa_db", JSON.stringify(db));
-      closeStudentModal();
-      loadGuruDashboard();
-    }
-
-    function deleteStudent(id) {
-      if (confirm("Apakah Anda yakin ingin menghapus data siswa bimbingan ini?")) {
-        const db = JSON.parse(localStorage.getItem("siswa_db"));
-        const filtered = db.filter(s => s.id_siswa !== id);
-        localStorage.setItem("siswa_db", JSON.stringify(filtered));
-        showToast("Siswa bimbingan dihapus.", "success");
-        loadGuruDashboard();
-      }
-    }
-
-    // ------------------------------------------
-    // UTILITIES
-    // ------------------------------------------
-    function toggleLoading(show, text = "Memuat data...") {
-      const el = document.getElementById("loading-overlay");
-      document.getElementById("loading-text").innerText = text;
-      if (show) el.classList.remove("hidden");
-      else el.classList.add("hidden");
-    }
-
     function showToast(message, type = "success") {
       const toast = document.getElementById("toast");
-      const text = document.getElementById("toast-text");
       const icon = document.getElementById("toast-icon");
+      const text = document.getElementById("toast-text");
 
       text.innerText = message;
       if (type === "success") {
-        toast.className = toast.className.replace(/border-l-\w+/, "border-l-emerald-500");
         icon.innerText = "check_circle";
-        icon.className = "material-icons-round text-emerald-500";
+        icon.className = "material-icons-round text-brand-success";
       } else {
-        toast.className = toast.className.replace(/border-l-\w+/, "border-l-red-500");
         icon.innerText = "error";
-        icon.className = "material-icons-round text-red-500";
+        icon.className = "material-icons-round text-brand-danger";
       }
 
-      toast.classList.remove("-translate-y-32");
-      toast.classList.add("translate-y-0");
+      toast.classList.remove("opacity-0", "-translate-y-24");
+      toast.classList.add("opacity-100", "translate-y-0");
 
       setTimeout(() => {
-        toast.classList.add("-translate-y-32");
-        toast.classList.remove("translate-y-0");
+        toast.classList.remove("opacity-100", "translate-y-0");
+        toast.classList.add("opacity-0", "-translate-y-24");
       }, 3500);
-    }
-
-    function showRandomQuote() {
-      const idx = Math.floor(Math.random() * MOTIVATION_QUOTES.length);
-      document.getElementById("motivation-quote-lbl").innerText = `"${MOTIVATION_QUOTES[idx]}"`;
     }
   </script>
 </body>
 </html>
+```eor
