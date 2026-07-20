@@ -3,12 +3,12 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Rise & Rest — Premium Hub</title>
+  <title>Rise & Rest — SMA Negeri 15 Maluku Tengah</title>
   
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght=400;500;600;700;800&display=swap" rel="stylesheet">
   <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
 
@@ -104,7 +104,7 @@
       </div>
     </div>
 
-    <!-- PREMIUM CONFIRMATION MODAL (No Alert Replacement) -->
+    <!-- PREMIUM CONFIRMATION MODAL -->
     <div id="modal-confirm" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm hidden transition-all duration-300">
       <div class="glass-card w-full max-w-sm rounded-3xl p-6 text-center space-y-4 border border-white/10 shadow-2xl">
         <div id="confirm-emoji" class="text-5xl">🏆</div>
@@ -121,11 +121,12 @@
     <!-- ==================================================== -->
     <div id="screen-login" class="flex flex-col justify-center min-h-[80vh] py-8">
       <div class="text-center mb-8">
-        <div class="inline-flex p-4 rounded-3xl bg-gradient-to-tr from-brand-primary to-brand-success shadow-xl shadow-blue-500/20 mb-4">
-          <span class="material-icons-round text-white text-4xl">wb_sunny</span>
+        <div class="inline-flex p-2.5 rounded-3xl bg-slate-900/60 border border-white/10 shadow-xl shadow-emerald-500/5 mb-4">
+          <!-- Logo resmi SMA Negeri 15 Maluku Tengah SMANLIBELS -->
+          <img src="LOGO SMANLIBELS.png" alt="Logo SMAN 15 Maluku Tengah" class="w-20 h-20 object-contain" onerror="this.src='https://placehold.co/80x80/070a13/ffffff?text=SMAN15'">
         </div>
         <h1 class="text-2xl font-black tracking-tight text-white">Rise & Rest</h1>
-        <p class="text-xs text-slate-400 mt-1" id="sub-school-title">SMA Negeri 1 Unggulan</p>
+        <p class="text-xs text-slate-400 mt-1" id="sub-school-title">SMA Negeri 15 Maluku Tengah</p>
       </div>
 
       <!-- Tab Otentikasi -->
@@ -218,9 +219,13 @@
               <p class="text-[11px] text-slate-400" id="lbl-kelas-guru">Kelas -- Wali: --</p>
             </div>
           </div>
-          <button onclick="handleLogout()" class="w-10 h-10 rounded-2xl bg-slate-900/40 hover:bg-red-500/15 border border-white/5 hover:border-red-500/30 flex items-center justify-center text-slate-400 hover:text-brand-danger transition-all">
-            <span class="material-icons-round">logout</span>
-          </button>
+          <div class="flex items-center gap-2">
+            <!-- Mini Logo SMANLIBELS di Header Siswa -->
+            <img src="LOGO SMANLIBELS.png" alt="SMANLIBELS" class="w-8 h-8 object-contain" onerror="this.style.display='none'">
+            <button onclick="handleLogout()" class="w-10 h-10 rounded-2xl bg-slate-900/40 hover:bg-red-500/15 border border-white/5 hover:border-red-500/30 flex items-center justify-center text-slate-400 hover:text-brand-danger transition-all">
+              <span class="material-icons-round">logout</span>
+            </button>
+          </div>
         </div>
 
         <!-- Contextual Greetings -->
@@ -356,12 +361,13 @@
           <div class="absolute top-0 right-0 w-24 h-24 bg-brand-primary/10 rounded-full filter blur-xl"></div>
           <div class="flex items-center justify-between relative z-10">
             <div class="flex items-center gap-4">
-              <div class="w-14 h-14 rounded-2xl bg-blue-600/10 border border-blue-500/20 flex items-center justify-center text-3xl">
-                👨‍🏫
+              <div class="w-14 h-14 rounded-2xl bg-blue-600/10 border border-blue-500/20 flex items-center justify-center p-1.5 shadow-md">
+                <!-- Logo Sekolah di dalam kotak profil guru -->
+                <img src="LOGO SMANLIBELS.png" alt="SMANLIBELS" class="w-full h-full object-contain" onerror="this.src='https://placehold.co/40x40/070a13/ffffff?text=S15'">
               </div>
               <div>
                 <h2 class="text-base font-extrabold tracking-tight text-white" id="lbl-guru-nama">Budi Santoso, S.Pd</h2>
-                <p class="text-[11px] text-blue-400 font-semibold tracking-wide uppercase mt-0.5" id="lbl-guru-kelas">Wali Kelas X-A — SMA Negeri 1</p>
+                <p class="text-[11px] text-blue-400 font-semibold tracking-wide uppercase mt-0.5" id="lbl-guru-kelas">Wali Kelas X-A — SMA Negeri 15 Maluku Tengah</p>
                 <span class="inline-block mt-2 px-2.5 py-0.5 rounded-full text-[9px] font-black bg-emerald-500/15 text-emerald-400 tracking-wider">
                   🟢 ONLINE CLOUD SPREADSHEET
                 </span>
@@ -532,9 +538,12 @@
           if (activeSession && activeSession.role === 'guru') {
             document.getElementById("lbl-guru-kelas").innerText = `Wali Kelas ${activeSession.profile.kelas_bimbingan} — ${data.nama_sekolah}`;
           }
+        } else {
+          document.getElementById("sub-school-title").innerText = "SMA Negeri 15 Maluku Tengah";
         }
       } catch (e) {
         console.warn("Metode luring aktif.");
+        document.getElementById("sub-school-title").innerText = "SMA Negeri 15 Maluku Tengah";
       }
     }
 
@@ -566,7 +575,7 @@
         
         // Render Guru Wali Profile
         document.getElementById("lbl-guru-nama").innerText = session.profile.nama_guru;
-        document.getElementById("lbl-guru-kelas").innerText = `Wali Kelas ${session.profile.kelas_bimbingan} — SMA Negeri 1`;
+        document.getElementById("lbl-guru-kelas").innerText = `Wali Kelas ${session.profile.kelas_bimbingan} — SMA Negeri 15 Maluku Tengah`;
         
         // Update Wali parameters
         settings.jam_tidur = session.profile.jam_tidur;
@@ -1130,7 +1139,7 @@
     // ----------------------------------------------------
     function sendNudgeWhatsApp(namaSiswa, phoneNo, checkinTidur, checkinBangun) {
       let textMessage = "";
-      const namaSekolah = "SMA Negeri 1";
+      const namaSekolah = "SMA Negeri 15 Maluku Tengah";
 
       const hasNotSlept = checkinTidur.toLowerCase().includes("belum");
       const hasNotWoken = checkinBangun.toLowerCase().includes("belum");
