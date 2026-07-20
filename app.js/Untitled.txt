@@ -1,0 +1,41 @@
+/**
+ * Core Application Initializer & PWA Service Worker Registration
+ */
+
+document.addEventListener("DOMContentLoaded", () => {
+  // Ambil Data Nama Sekolah dari Endpoint GET Script
+  fetchInitialData();
+
+  // Registrasi Service Worker untuk kapabilitas PWA Offline
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('sw.js')
+        .then(reg => console.log('Service Worker terdaftar di scope: ', reg.scope))
+        .catch(err => console.error('Pendaftaran Service Worker Gagal: ', err));
+    });
+  }
+});
+
+// Mengambil konfigurasi inisialisasi aplikasi dari server
+async function fetchInitialData() {
+  try {
+    const res = await fetch(`${CONFIG.API_ENDPOINT}?action=getInitData`);
+    const data = await res.json();
+    if (data.success && data.nama_sekolah) {
+      document.getElementById('sub-school').innerText = data.nama_sekolah;
+    }
+  } catch (e) {
+    console.log("Menggunakan default metadata sekolah.");
+  }
+}
+
+// Rekayasa Animasi Toast UI Komponen
+function showToast(message, type = "success") {
+  const toast = document.getElementById('toast');
+  toast.innerText = message;
+  toast.className = `show toast-${type}`;
+  
+  setTimeout(() => {
+    toast.className = "toast-hidden";
+  }, 3500);
+}
